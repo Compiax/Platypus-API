@@ -1,0 +1,28 @@
+{
+  "cors": {
+    "origin": [
+      "https://platypus.com",
+      "https://www.platypus.com"
+    ],
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS"
+    ]
+  },
+  "session": {
+    "secret": "platypus-session-secret-prod"
+  },
+  "servers": {
+    "http": {
+      "port": "3000"
+    },
+    "db": {
+      "host": "platypus-db-prod",
+      "database": "platypus"
+    }
+  }
+}
