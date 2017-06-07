@@ -1,0 +1,25 @@
+{
+  "cors": {
+    "origin": "https://dev.platypus.com",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS"
+    ]
+  },
+  "session": {
+    "secret": "platypus-session-secret-dev"
+  },
+  "servers": {
+    "http": {
+      "port": "3000"
+    },
+    "db": {
+      "host": "platypus-db-dev",
+      "database": "platypus"
+    }
+  }
+}
