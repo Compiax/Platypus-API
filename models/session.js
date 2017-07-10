@@ -8,21 +8,21 @@ var Schema      = mongoose.Schema;
 
 debug('Defining schema: Session');
 var Session = new Schema({
-  session_id  : {type: Number, index: { unique: true }},
+  session_id  : {type: String, index: { unique: true }},
   image_path  : String,
   bill_items  : [{
-    item_id       : {type: Number, index: { unique: true }},
+    item_id       : {type: String, index: { unique: true }},
     item_name     : String,
     item_quantity : Number,
     item_price    : Number
   }],
   users       : [{
-    u_id          : {type: Number, index: { unique: true }},
+    u_id          : {type: String, index: { unique: true }},
     u_owner       : Boolean,
     u_nickname    : String,
     u_color       : String,
     u_claimed     : [{item: Number, quantity: Number}]
-  }],
+  }]
 });
 
 debug('Adding custom schema method: generateSessionID');
