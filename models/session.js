@@ -11,7 +11,7 @@ var Session = new Schema({
   session_id  : {type: String, index: { unique: true }},
   image_path  : String,
   bill_items  : [{
-    item_id       : {type: String, index: { unique: true }},
+    item_id       : String,
     item_name     : String,
     item_quantity : Number,
     item_price    : Number
@@ -22,12 +22,16 @@ var Session = new Schema({
     u_nickname    : String,
     u_color       : String,
     u_claimed     : [{item: Number, quantity: Number}]
-  }]
+  }],
+  users_count : Number
 });
 
 debug('Adding custom schema method: generateSessionID');
-Session.methods.generateSessionID = function(){
-  var alphabet = "abcdefghijklmnopqrstuvwxyz";
+/**
+ * Method to generate and store session ID.
+ */
+Session.methods.generateSessionID = function() {
+  var alphabet = "abcdefghjklmnopqrstvwxyz";
   var numbers = "0123456789";
   var session_id_temp = "";
 
@@ -35,7 +39,7 @@ Session.methods.generateSessionID = function(){
     var char_or_int = (Math.floor(Math.random() * 2));
 
     if (char_or_int === 0) {
-      var alphabet_index = (Math.floor(Math.random() * 26));
+      var alphabet_index = (Math.floor(Math.random() * 24));
       session_id_temp = session_id_temp + alphabet.charAt(alphabet_index);
     }
     else {
@@ -47,6 +51,22 @@ Session.methods.generateSessionID = function(){
   debug('Setting session_id_temp = ' + session_id_temp);
   this.session_id = session_id_temp;
 };
+
+debug('Adding custom schema method: addUser')
+/**
+ * Method to generate and store a user ID.
+ */
+Session.methods.addUser = function() {
+  var new_uid = (this.users_count + 1).toString();
+  if (new_uid.length < 2) {
+    new_uid = this.session_id + "u0" + new_uid;
+  }
+  else {
+    new_uid = this.session_id + "u" + new_uid;
+  }
+  this.users[this.users_count].u_id = new_uid;
+  this.users_count = this.users_count + 1;
+}
 
 debug('Session model exported');
 module.exports = mongoose.model('Session', Session);
