@@ -4,18 +4,18 @@ var spawn       = require('child_process').spawn;
 debug('Exporting method: detectText');
 module.exports.detectText = function(req, res, next){
   debug("req: " + req);
-  console.log("req: " + req);
+  console.log(req);
 
-  var response = {
-    data: {
-      type: 'session',
-	    id: 0,
-	    attributes: {
-	      session_id: '@todo',
-        user_id: '@todo'
-	    }
-    }
-  };
+  debug("Spawning python thing.");
+  py = spawn('python',['ocr.py', req]);
+  var recognisedText = "";
+  py.stdout.on('data',function(filenames) {
+  	recognisedText += filenames.toString();
+  });
 
-  res.status(200).send(response);
+  return py.stdout.on('end',function() {
+  	console.log('Characters recognised: ',recognisedText);
+    return recognisedText;
+  });
+  //res.status(200).send(response);
 }

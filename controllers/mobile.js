@@ -2,6 +2,7 @@ var Bills     = require('../models/bills');
 var debug     = require('debug')('platypus-api:controllers:mobile');
 var fs        = require('fs');
 var multer    = require('multer');
+var ocr       = require('./ocr');
 
 debug('Exporting method: createSession');
 /**
@@ -65,12 +66,35 @@ module.exports.sendImage = function(req, res, next){
           if (err) throw err;
           // TODO: Function call to OCR module
           debug('File uploaded to: ' + target_path + ' - ' + req.file.size + ' bytes');
+          detect(target_path);
       });
   });
 
   var query = Bills.where({bill_id: req.body.session_id});
   query.update({$set: {bill_image : req.file.originalname}}).exec();
 
+
+
   debug('Sending response (status: 200)');
   res.status(200).send("Success");
+}
+
+function detect(target_path) {
+  var stringy = ocr.detectText(target_path);
+
+  console.log(stringy);
+
+  var response = {
+    data: {
+      type: 'session',
+	    id: 0,
+	    attributes: {
+	      text: stringy
+	    }
+    }
+  };
+  console.log("Looky Here! 2");
+  console.log(response);
+  console.log("Looky Here! 1");
+
 }
