@@ -7,6 +7,8 @@ var router = express.Router();
 
 router.post('/createSession', mobile.createSession);
 
+router.post('/joinSession', mobile.joinSession);
+
 router.post('/sendImage', mobile.sendImage);
 
 debug('Mobile router exported');
