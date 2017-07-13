@@ -1,8 +1,12 @@
 var debug       = require('debug')('platypus-api:controllers:ocr');
+var spawn       = require('child_process').spawn;
 
-debug('Exporting method: @todo');
-module.exports.todo = function(req, res, next){
-    var response = {
+debug('Exporting method: detectText');
+module.exports.detectText = function(req, res, next){
+  debug("req: " + req);
+  console.log("req: " + req);
+
+  var response = {
     data: {
       type: 'session',
 	    id: 0,
@@ -12,6 +16,6 @@ module.exports.todo = function(req, res, next){
 	    }
     }
   };
-  
+
   res.status(200).send(response);
 }
