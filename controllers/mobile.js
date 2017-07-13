@@ -47,6 +47,35 @@ module.exports.createSession = function(req, res, next){
   res.status(200).send(response);
 }
 
+debug("Exporting method: joinSession");
+/**
+  * Function that allows new users to join an existing session that has already
+  * been created.
+  * @return {Object}
+  */
+module.exports.joinSession = new function(req, res, next) {
+  debug("joinSession called");
+  var nickname = req.body.nickname;
+  var user_color = req.body.color;
+  debug("Nickname: " + nickname + " And color: " + user_color);
+
+  var session_id = req.body.bill_id;
+  debug("Session ID: " + session_id);
+
+  debug("Searching DB for session");
+  // TODO: Get bill in db that matches session_id
+  var bill = "";
+
+  // TODO: refine error checking that valid bill is found
+  if (bill != null) {
+    debug("Adding new user to existing bill");
+    bill.addUser(nickname, user_color);
+  }
+
+  debug('Sending response (status: 200)');
+  res.status(200).send(response);
+}
+
 debug("Exporting method sendImage");
 /**
  * Function call to upload a file to the server. Image is saved in ./uploads
