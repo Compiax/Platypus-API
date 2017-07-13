@@ -1,5 +1,12 @@
-var Session     = require('../models/session');
-var debug       = require('debug')('platypus-api:controllers:mobile');
+var Bills     = require('../models/bills');
+var debug     = require('debug')('platypus-api:controllers:mobile');
+var multer    = require('multer');
+var upload    = multer({ dest: '../uploads/' });
+
+// upload.single('avatar'), function (req, res, next) {
+//   // req.file is the `avatar` file
+//   // req.body will hold the text fields, if there were any
+// })
 
 debug('Exporting method: createSession');
 /**
@@ -10,47 +17,51 @@ debug('Exporting method: createSession');
 module.exports.createSession = function(req, res, next){
   var nickname = req.body.nickname;
   var user_color = req.body.color;
-  var new_session = Session({
-    session_id  : "",
-    image_path  : "",
-    bill_items  : [{
-      item_id       : "",
-      item_name     : "",
-      item_quantity : 0,
-      item_price    : 0
-    }],
-    users       : [{
-      u_id          : "",
-      u_owner       : true,
-      u_nickname    : nickname,
-      u_color       : user_color,
-      u_claimed     : [{item: 0, quantity: 0}]
-    }],
-    users_count : 0
+  debug("Nickname: " + nickname + " And color: " + user_color);
+
+  var bill = new Bills({
+    bill_id     : "",
+    bill_image  : "",
+    users_count : 0,
+    users       : [],
+    bill_items  : []
   });
 
-  new_session.generateSessionID();
-  new_session.addUser();
-  new_session.isNew = true;
+  while (!bill.generateBillID()) {
 
-  debug('Saving Session');
-  new_session.save(function (err, new_session) {
+  }
+
+  bill.save(function(err) {
     if (err) {
-      return console.error("Session not saved!");
+      // TODO: Create Error class for db errors
+      return 0;
     }
   });
 
   var response = {
     data: {
-      type: 'session',
+      type: 'bill',
 	    id: 0,
 	    attributes: {
-	      session_id: new_session.session_id,
-        user_id: new_session.users[0].u_id
+	      session_id: bill.bill_id,
 	    }
     }
   };
 
   debug('Sending response (status: 200)');
   res.status(200).send(response);
+}
+
+debug("Exporting method sendImage");
+module.exports.sendImage = function(req, res, next){
+  debug("Image function called");
+  debug("req: " + req);
+  console.log(req);
+  var s_img = req.body.image;
+  var s_id = req.body.session_id;
+  debug("Image: " + s_img);
+  debug("Session ID: " + s_id);
+
+  debug('Sending response (status: 200)');
+  res.status(200).send("Success");
 }
