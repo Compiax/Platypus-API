@@ -6,6 +6,7 @@ var errors          = require('../middleware/errors');
 var express         = require('express');
 var logger          = require('morgan');
 var mongoose        = require('mongoose');
+var multer          = require('multer');
 var passport        = require('passport');
 var session         = require('express-session');
 var routes          = require('../routes');
@@ -27,7 +28,8 @@ var init = function(config){
 
   debug('Adding body-parser');
   app.use(bodyParser.urlencoded({
-    extended: true
+    extended: true,
+    uploadDir: './uploads'
   }));
 
   debug('Adding cookie-parser');
@@ -51,6 +53,9 @@ var init = function(config){
   debug('Adding passport');
   app.use(passport.initialize());
   app.use(passport.session());
+
+  debug('Adding multer');
+  app.use(multer({dest: './uploads/'}).single('file'));
 
   debug('Adding router');
   app.use('/', routes);
