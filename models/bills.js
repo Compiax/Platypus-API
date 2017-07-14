@@ -87,6 +87,7 @@ Bills.methods.addUser = function(u_name, u_col) {
       return 0;
     }
   });
+  return new_uid;
 }
 
 debug('Bills model exported');
