@@ -74,3 +74,24 @@ module.exports.sendImage = function(req, res, next){
   debug('Sending response (status: 200)');
   res.status(200).send("Success");
 }
+
+module.exports.terminateSession = function(req, res, next){
+  debug("Terminate Session called");
+
+  var session = req.body.session_id;
+  var found = false;
+  /// TODO: Searh through DB for the correct session
+
+  debug("Ensuring correct session is found");
+  if (found) {
+    /// TODO: Remove session from DB
+
+    debug("Session found: Response (status: 200)");
+    res.status(200).send("Success");
+  }
+  /// TODO: Replace with more appropriate error management
+  else {
+    debug("Session not found: Response (Status: 500)");
+    res.status(500).send("Session not found");
+  }
+}
