@@ -53,7 +53,7 @@ debug("Exporting method: joinSession");
   * been created.
   * @return {Object}
   */
-module.exports.joinSession = new function(req, res, next) {
+module.exports.joinSession = function(req, res, next) {
   debug("joinSession called");
   var nickname = req.body.nickname;
   var user_color = req.body.color;
@@ -62,25 +62,19 @@ module.exports.joinSession = new function(req, res, next) {
   var session_id = req.body.session_id;
   debug("Session ID: " + session_id);
 
-  debug("Searching DB for session");
-  // TODO: Get bill in db that matches session_id
-  var bill = new Bills({
-    bill_id     : "",
-    bill_image  : "",
-    users_count : 0,
-    users       : [],
-    bill_items  : []
-  });
-  bill.find({'bill_id' : session_id});
+  debug("Searching DB for bill with session_id");
+  //var query = Bills.where({bill_id: session_id});
+  var bill = Bills.findOne({bill_id: session_id});
+  console.log(bill);
 
   // TODO: refine error checking that valid bill is found
-  var uid;
-  if (bill != null) {
-    debug("Adding new user to existing bill");
-    uid = bill.addUser(nickname, user_color);
-  }
+  var uid = 0;
+  // if (bill != null) {
+  //   debug("Adding new user to existing bill");
+  //   uid = bill.addUser(nickname, user_color);
+  // }
 
-
+  debug("Respond with user_id");
   var response = {"user_id": uid};
   debug('Sending response (status: 200)');
   res.status(200).send(response);
