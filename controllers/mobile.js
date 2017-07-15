@@ -86,12 +86,12 @@ module.exports.terminateSession = function(req, res, next){
   if (found) {
     /// TODO: Remove session from DB
 
-    debug("Session found: Response (status: 200)");
-    res.status(200).send("Success");
+    debug("Session found, removing: Response (status: 200)");
+    res.status(200).send("Success, session removed");
   }
   /// TODO: Replace with more appropriate error management
   else {
-    debug("Session not found: Response (Status: 500)");
-    res.status(500).send("Session not found");
+    debug("Session not found, doing nothing: Response (Status: 200)");
+    res.status(200).send("Session not found, doing nothing");
   }
 }
