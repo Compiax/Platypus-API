@@ -80,21 +80,13 @@ module.exports.sendImage = function(req, res, next){
 }
 
 function detect(target_path) {
-  var stringy = ocr.detectText(target_path);
-
-  console.log(stringy);
-
-  var response = {
-    data: {
-      type: 'session',
-	    id: 0,
-	    attributes: {
-	      text: stringy
-	    }
-    }
-  };
-  console.log("Looky Here! 2");
-  console.log(response);
-  console.log("Looky Here! 1");
-
+  var formData = {
+  	my_file: fs.createReadStream(target_path),
+	};
+	request.post({url:'http://localhost:3002', formData: formData}, function optionalCallback(err, httpResponse, body) {
+	  if (err) {
+	    return console.error('upload failed:', err);
+	  }
+	  debug(body);
+	});
 }
