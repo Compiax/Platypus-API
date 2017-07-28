@@ -1,3 +1,8 @@
+/**
+ * @file This file implements the defined routes for use by the mobile
+ * componant.
+ */
+
 var Bills     = require('../models/bills');
 var debug     = require('debug')('platypus-api:controllers:mobile');
 var fs        = require('fs');
@@ -75,12 +80,17 @@ module.exports.sendImage = function(req, res, next){
   res.status(200).send("Success");
 }
 
+/**
+ * This module will terminate the existing session when called.
+ * req  contains the session_id in req.body.session_id
+ * res  response sent back to calling module
+ */
 module.exports.terminateSession = function(req, res, next){
   debug("Terminate Session called");
 
   var session = req.body.session_id;
   var found = false;
-  /// TODO: Searh through DB for the correct session
+  ///TODO: Searh through DB for the correct session
 
   debug("Ensuring correct session is found");
   if (found) {
