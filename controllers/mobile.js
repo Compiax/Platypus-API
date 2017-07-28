@@ -3,6 +3,7 @@ var debug     = require('debug')('platypus-api:controllers:mobile');
 var fs        = require('fs');
 var multer    = require('multer');
 var ocr       = require('./ocr');
+var request   = require('request');
 
 debug('Exporting method: createSession');
 /**
@@ -83,7 +84,7 @@ function detect(target_path) {
   var formData = {
   	my_file: fs.createReadStream(target_path),
 	};
-	request.post({url:'http://localhost:3002', formData: formData}, function optionalCallback(err, httpResponse, body) {
+	request.post({url:'http://localhost:5000', formData: formData}, function optionalCallback(err, httpResponse, body) {
 	  if (err) {
 	    return console.error('upload failed:', err);
 	  }
