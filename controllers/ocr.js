@@ -5,7 +5,12 @@
 var debug       = require('debug')('platypus-api:controllers:ocr');
 
 /**
- * @todo Once this method is correctly implemented complete documentation.
+ * @TODO Once this method is correctly implemented complete documentation.
+ * @param {request} req req used by Express.js to fetch data from the client.
+ * @param {response} res res used by Express.js to send responses back to the
+ *                       client.
+ * @param {object} next
+ * @return JSON object containing Bill information
  */
 debug('Exporting method: @todo');
 module.exports.todo = function(req, res, next){

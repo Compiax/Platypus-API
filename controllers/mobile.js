@@ -12,7 +12,11 @@ debug('Exporting method: createSession');
 /**
  * Function that receives the user data (Nickname and profile color) entered
  * when a user requests a new session.
- * @return {Object}        JSON object containing session ID and user ID
+ * @param {request} req req used by Express.js to fetch data from the client.
+ * @param {response} res res used by Express.js to send responses back to the
+ *                       client.
+ * @param {object} next
+ * @return JSON object containing session ID and user ID
  */
 module.exports.createSession = function(req, res, next){
   var nickname = req.body.nickname;
@@ -56,8 +60,13 @@ debug("Exporting method sendImage");
 /**
  * Function call to upload a file to the server. Image is saved in ./uploads
  * Image name is added to the database.
- * Session ID is contained in req.body.session_id
- * File name is contained in req.file.originalname
+ * @param {request} req req used by Express.js to fetch data from the client.
+ *                      Used to fetch session_id from req.body.session_id and
+ *                      the file name from req.body.originalname.
+ * @param {response} res res used by Express.js to send responses back to the
+ *                       client.
+ * @param {object} next
+ * @return HTTP status 200 using res.send().
  */
 module.exports.sendImage = function(req, res, next){
   debug("Image function called");
@@ -82,24 +91,34 @@ module.exports.sendImage = function(req, res, next){
 
 /**
  * This module will terminate the existing session when called.
- * req  contains the session_id in req.body.session_id
- * res  response sent back to calling module
+ * @param {request} req req used by Express.js to fetch data from the client.
+ *                      Session is fetched from req.body.session_id.
+ * @param {response} res res used by Express.js to send responses back to the
+ *                       client.
+ * @param {object} next
+ * @returns HTTP status 200 using res.send().
  */
 module.exports.terminateSession = function(req, res, next){
   debug("Terminate Session called");
 
   var session = req.body.session_id;
   var found = false;
-  ///TODO: Searh through DB for the correct session
+  /**
+   * TODO: Searh through DB for the correct session]
+   */
 
   debug("Ensuring correct session is found");
   if (found) {
-    /// TODO: Remove session from DB
+    /**
+     * TODO: Remove session from DB
+     */
 
     debug("Session found, removing: Response (status: 200)");
     res.status(200).send("Success, session removed");
   }
-  /// TODO: Replace with more appropriate error management
+  /**
+   * TODO: Replace with more appropriate error management
+   */
   else {
     debug("Session not found, doing nothing: Response (Status: 200)");
     res.status(200).send("Session not found, doing nothing");
