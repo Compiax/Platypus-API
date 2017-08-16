@@ -9,5 +9,7 @@ router.post('/createSession', mobile.createSession);
 
 router.post('/sendImage', mobile.sendImage);
 
+router.post('/joinSession', mobile.joinSession);
+
 debug('Mobile router exported');
 module.exports = router;

@@ -15,6 +15,10 @@ var Bills = new Schema({
   users_count : Number,
   users       : [{ type: ObjectId, ref: 'Users' }],
   bill_items  : [{ type: ObjectId, ref: 'Items' }]
+}, {
+    toJSON: {
+        virtuals: true
+    }
 });
 
 debug('Adding custom schema method: generateBillsID');
@@ -55,7 +59,8 @@ debug('Adding custom schema method: addUser')
 /**
  * Method to generate and store a user ID.
  */
-Bills.methods.addUser = function(u_name, u_col) {
+Bills.virtual('addUser').get(function(s_id, u_name, u_col) {
+  var query = this.model('Bills').where({bill_id: s_id});
   var new_uid = (this.users_count + 1).toString();
   var own = false;
   if (new_uid.length < 2) {
@@ -87,7 +92,10 @@ Bills.methods.addUser = function(u_name, u_col) {
       return 0;
     }
   });
-}
+  return new_uid;
+});
+
+
 
 debug('Bills model exported');
 module.exports = mongoose.model('Bills', Bills);

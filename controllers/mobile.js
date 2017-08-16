@@ -82,13 +82,13 @@ module.exports.sendImage = function(req, res, next){
 
 function detect(target_path) {
   var formData = {
-  	my_file: fs.createReadStream(target_path),
+  	file: fs.createReadStream(target_path),
 	};
-	request.post({url:'http://localhost:3001/', formData: formData}, function optionalCallback(err, httpResponse, body) {
+	request.post({url:'http://192.168.43.144:3001/', formData: formData}, function optionalCallback(err, httpResponse, body) {
 	  if (err) {
-      debug(body);
+      debug(httpResponse);
 	    return console.error('upload failed:', err);
 	  }
-	  debug(body);
+	  debug(httpResponse.toJSON);
 	});
 }
