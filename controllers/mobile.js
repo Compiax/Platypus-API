@@ -7,6 +7,8 @@ var Bills     = require('../models/bills');
 var debug     = require('debug')('platypus-api:controllers:mobile');
 var fs        = require('fs');
 var multer    = require('multer');
+var ocr       = require('./ocr');
+var request   = require('request');
 
 debug('Exporting method: createSession');
 /**
@@ -79,16 +81,31 @@ module.exports.sendImage = function(req, res, next){
           if (err) throw err;
           // TODO: Function call to OCR module
           debug('File uploaded to: ' + target_path + ' - ' + req.file.size + ' bytes');
+          detect(target_path);
       });
   });
 
   var query = Bills.where({bill_id: req.body.session_id});
   query.update({$set: {bill_image : req.file.originalname}}).exec();
 
+
+
   debug('Sending response (status: 200)');
   res.status(200).send("Success");
 }
 
+function detect(target_path) {
+  var formData = {
+  	file: fs.createReadStream(target_path),
+	};
+	request.post({url:'http://192.168.43.144:3001/', formData: formData}, function optionalCallback(err, httpResponse, body) {
+	  if (err) {
+      debug(httpResponse);
+	    return console.error('upload failed:', err);
+	  }
+	  debug(httpResponse.toJSON);
+  });
+  
 /**
  * This module will terminate the existing session when called.
  * @param {request} req req used by Express.js to fetch data from the client.

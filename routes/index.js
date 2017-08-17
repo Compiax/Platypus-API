@@ -1,14 +1,14 @@
 var debug     = require('debug')('platypus-api:routes');
 var express   = require('express');
-var test     = require('./test');
-var mobile     = require('./mobile');
+var mobile    = require('./mobile');
+var ocr       = require('./ocr');
 
 var router = express.Router();
 
 debug('Adding routes');
 
-router.use('/test', test);
 router.use('/mobile', mobile);
+router.use('/ocr', ocr);
 
 debug('Main router exported');
 module.exports = router;
