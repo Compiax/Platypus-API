@@ -14,15 +14,19 @@ var router = express.Router();
 router.post('/createSession', mobile.createSession);
 
 /**
+ * Define Route for the joinSession function.
+ */
+router.post('/joinSession', mobile.joinSession);
+
+/**
  * Define Route for the sendImage function.
  */
 router.post('/sendImage', mobile.sendImage);
+
 /**
  * Define route for the terminateSession function.
  */
 router.post('/terminateSession', mobile.terminateSession);
-
-router.post('/joinSession', mobile.joinSession);
 
 debug('Mobile router exported');
 module.exports = router;
