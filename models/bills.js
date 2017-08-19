@@ -15,6 +15,10 @@ var Bills = new Schema({
   users_count : Number,
   users       : [{ type: ObjectId, ref: 'Users' }],
   bill_items  : [{ type: ObjectId, ref: 'Items' }]
+}, {
+    toJSON: {
+        virtuals: true
+    }
 });
 
 module.exports = mongoose.model('Bills', Bills);

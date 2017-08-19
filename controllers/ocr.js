@@ -1,5 +1,17 @@
+/**
+ * @file This file implements the defined routes for use by the OCR componant
+ */
+
 var debug       = require('debug')('platypus-api:controllers:ocr');
 
+/**
+ * @TODO Once this method is correctly implemented complete documentation.
+ * @param {request} req req used by Express.js to fetch data from the client.
+ * @param {response} res res used by Express.js to send responses back to the
+ *                       client.
+ * @param {object} next
+ * @return JSON object containing Bill information
+ */
 debug('Exporting method: @todo');
 module.exports.detect = function(req, res, next) {
   var ocr_module = config.ocr.host;

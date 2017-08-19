@@ -1,6 +1,5 @@
-var debug = require('debug')('platypus-api:helpers:errors:custom');
-
-/**
+/*
+ * @file
  * -----------------------------------------------------------------------------
  * This is the custom Error class that Platypus API will use.
  * This class is built specifically to be used for HTML xxx client errors as well as
@@ -21,6 +20,8 @@ var debug = require('debug')('platypus-api:helpers:errors:custom');
  *  - specific: There utilize either HTML custom errors or are completely application specific.
  *  e.g. user.NotFound is a specific implementation of the html.NotFound class.
  */
+
+var debug = require('debug')('platypus-api:helpers:errors:custom');
 
 debug('Defining class: CustomError');
 var CustomError = function(message = null){
