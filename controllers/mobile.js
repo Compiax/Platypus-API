@@ -61,20 +61,19 @@ module.exports.createSession = function(req, res, next){
 }
 
 module.exports.joinSession = function(req, res, next){
-  var user_added = addUserToDB(req.body.session_id, req.body.nickname, req.body.color);
-  
-  var response = {
-    data: {
-      type: 'user_id',
-      id: 0,
-      attributes: {
-        u_id: user_added
+  addUserToDB(req.body.session_id, req.body.nickname, req.body.color).then(function (uid_response) {
+    var response = {
+      data: {
+        type: 'bill',
+        id: 0,
+        attributes: {
+          user_id: uid_response
+        }
       }
-    }
-  };
-
-  debug('Sending response (status: 200)');
-  res.status(200).send(response);
+    };
+    debug('Sending response (status: 200)');
+    return res.status(200).send(response);
+  });
 }
 
 debug("Exporting method sendImage");
@@ -126,27 +125,11 @@ module.exports.terminateSession = function(req, res, next){
   debug("Terminate Session called");
 
   var session = req.body.session_id;
-  var found = false;
-  /**
-   * TODO: Searh through DB for the correct session]
-   */
+  var query = Bills.find({bill_id: session});
 
-  debug("Ensuring correct session is found");
-  if (found) {
-    /**
-     * TODO: Remove session from DB
-     */
-
-    debug("Session found, removing: Response (status: 200)");
-    res.status(200).send("Success, session removed");
-  }
-  /**
-   * TODO: Replace with more appropriate error management
-   */
-  else {
-    debug("Session not found, doing nothing: Response (Status: 200)");
-    res.status(200).send("Session not found, doing nothing");
-  }
+  query.remove({users: {$size: 0}}, function(err) {
+    if (err) return handleError(err);
+  });
 }
 
 debug('Adding custom schema method: generateBillsID');
@@ -225,7 +208,7 @@ function addUserToDB(session_id, nname, ucolor) {
       bill_session.users_count = user_count+1;
     
       bill_session.save(function (err) {
-        if (err) return handleError(err)
+        if (err) return handleError(err);
         console.log('Success!');
       });
       debug("Added obj: " + bill_session.users[user_count-1]);
