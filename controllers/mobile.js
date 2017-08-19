@@ -130,6 +130,8 @@ module.exports.terminateSession = function(req, res, next){
   query.remove({users: {$size: 0}}, function(err) {
     if (err) return handleError(err);
   });
+  debug('Sending response (status: 200)');
+  res.status(200).send("Success");
 }
 
 debug('Adding custom schema method: generateBillsID');
@@ -209,7 +211,6 @@ function addUserToDB(session_id, nname, ucolor) {
     
       bill_session.save(function (err) {
         if (err) return handleError(err);
-        console.log('Success!');
       });
       debug("Added obj: " + bill_session.users[user_count-1]);
       resolve(user_id);
