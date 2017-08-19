@@ -51,44 +51,5 @@ Bills.methods.generateBillID = function() {
   return true;
 };
 
-debug('Adding custom schema method: addUser')
-/**
- * Method to generate and store a user ID.
- */
-Bills.methods.addUser = function(u_name, u_col) {
-  var new_uid = (this.users_count + 1).toString();
-  var own = false;
-  if (new_uid.length < 2) {
-    new_uid = this.bill_id + 'u0' + new_uid;
-  }
-  else {
-    new_uid = this.bill_id + 'u' + new_uid;
-  }
-
-  if (this.users_count == 0) {
-    own = true;
-  }
-
-  var user = new Users({
-    u_id          : new_uid,
-    u_owner       : own,
-    u_nickname    : u_name,
-    u_color       : u_col
-  })
-
-  this.users.push(user);
-  var subdoc = this.users[this.users_count];
-  subdoc.isNew;
-  this.users_count = this.users_count + 1;
-
-  this.save(function(err) {
-    if (err) {
-      // TODO: Create Error class for db errors
-      return 0;
-    }
-  });
-  return new_uid;
-}
-
 debug('Bills model exported');
 module.exports = mongoose.model('Bills', Bills);

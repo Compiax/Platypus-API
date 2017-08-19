@@ -4,7 +4,8 @@ var ocr     = require('../controllers/ocr');
 
 var router = express.Router();
 
-router.post('/createSession', ocr.createSession);
+debug('Adding route: POST /');
+router.post('/detect', ocr.detect);
 
 debug('OCR router exported');
 module.exports = router;
