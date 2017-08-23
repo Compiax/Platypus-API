@@ -1,8 +1,10 @@
 /**
  * @file This file implements the defined routes for use by the OCR componant
  */
-
+var config      = require('config');
 var debug       = require('debug')('platypus-api:controllers:ocr');
+var fs          = require('fs');
+var request     = require('request');
 
 /**
  * @TODO Once this method is correctly implemented complete documentation.
@@ -13,30 +15,33 @@ var debug       = require('debug')('platypus-api:controllers:ocr');
  * @return JSON object containing Bill information
  */
 debug('Exporting method: @todo');
-module.exports.detect = function(req, res, next) {
-  var ocr_module = config.ocr.host;
-  var ocr_port = config.ocr.port;
+module.exports.detect = function(target_path, bill) {
+  var ocr_module = config.servers.ocr.host;
+  var ocr_port = config.servers.ocr.port;
   var formData = {
-  	file: fs.createReadStream(req.body.target_path),
+  	file: fs.createReadStream(target_path),
 	};
-	request.post({url:'http://' + ocr_module + ':' + ocr_port + '/', formData: formData}, function optionalCallback(err, httpResponse, body) {
+	request.post({url:'http://192.168.43.144' + /*+ ocr_module +*/ ':' + ocr_port + '/', formData: formData, json: true}, function optionalCallback(err, httpResponse, body) {
 	  if (err) {
       debug(httpResponse);
 	    return console.error('upload failed:', err);
-	  }
-	  debug(httpResponse.toJSON);
+    }
+    debug("HTTPResponse: ");
+    debug(httpResponse);
+    debug("Body: ");
+    debug(body.attributes.data);
   });
 
   var response = {
     data: {
-      type: 'bill',
+      type: 'ocr',
 	    id: 0,
 	    attributes: {
-	      session_id: bill.bill_id,
+	      session_id: bill,
 	    }
     }
   };
 
   debug('Sending response (status: 200)');
-  res.status(200).send(response);
+  return response;
 }

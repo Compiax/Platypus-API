@@ -9,7 +9,6 @@ var debug     = require('debug')('platypus-api:controllers:mobile');
 var fs        = require('fs');
 var multer    = require('multer');
 var ocr       = require('./ocr');
-var request   = require('request');
 
 debug('Exporting method: createSession');
 /**
@@ -99,7 +98,7 @@ module.exports.sendImage = function(req, res, next){
           if (err) throw err;
           // TODO: Function call to OCR module
           debug('File uploaded to: ' + target_path + ' - ' + req.file.size + ' bytes');
-          ocr.detect(target_path);
+          ocr.detect(target_path,req.body.session_id);
       });
   });
 
