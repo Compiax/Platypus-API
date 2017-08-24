@@ -181,6 +181,14 @@ function getUserId(num) {
   return new_uid;
 }
 
+/**
+ * This function is called to add a new user to the database for the current
+ * bill session.
+ * @param {bill_id} session_id This is the unique session ID to find the correct
+ *                             Session to add the user to.
+ * @param {String} nname This is the name of the new user.
+ * @param {String} ucolor The color selected by the user
+ */
 function addUserToDB(session_id, nname, ucolor) {
   return new Promise(function (resolve, reject) {
     var finalid = null;
