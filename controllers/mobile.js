@@ -62,6 +62,18 @@ module.exports.createSession = function(req, res, next){
   });
 }
 
+/**
+ * This route is called to allow a new user to join an existing session. Data
+ * is fetched from the client. addUserToDB() is then called to perform the
+ * adding of new client data to the session.
+ * @param {request} req req used by Express.js to fetch data from the client.
+ *                      Used to fetch: req.body.session_id, req.body.nickname
+ *                      and req.body.color from the client.
+ * @param {response} res res used by Express.js to send HTTP responses back to
+ *                       the client.
+ * @param {object} next
+ * @return HTTP status 200 using res.send().
+ */
 module.exports.joinSession = function(req, res, next){
   addUserToDB(req.body.session_id, req.body.nickname, req.body.color).then(function (uid_response) {
     var response = {
