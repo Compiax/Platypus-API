@@ -27,7 +27,7 @@ module.exports.createSession = function(req, res, next){
   var b_id = generateBillID();
   var user_added = "";
   debug("Nickname: " + nickname + ", Color: " + user_color, ", For bill ID: " + b_id);
-  
+
   var bill = new Bills({
     bill_id     : b_id,
     bill_image  : "",
@@ -35,10 +35,12 @@ module.exports.createSession = function(req, res, next){
     users       : [],
     bill_items  : []
   });
-  
+
   bill.save(function(err) {
     if (err) {
-      // TODO: Create Error class for db errors
+      /**
+      *  TODO: Create Error class for db errors
+      */
       debug(err);
     }
     user_added = addUserToDB(b_id, req.body.nickname, req.body.color).then(function (uid_response) {
@@ -52,7 +54,7 @@ module.exports.createSession = function(req, res, next){
           }
         }
       };
-      
+
       debug("Session ID: " + response.data.attributes.session_id + ", User ID: " + response.data.attributes.user_id);
       debug('Sending response (status: 200)');
       return res.status(200).send(response);
@@ -111,7 +113,7 @@ module.exports.sendImage = function(req, res, next){
   debug('Sending response (status: 200)');
   res.status(200).send("Success");
 }
-  
+
 /**
  * This module will terminate the existing session when called.
  * @param {request} req req used by Express.js to fetch data from the client.
@@ -162,7 +164,11 @@ function generateBillID() {
   });
   return bill_id_temp;
 };
-
+/**
+ * This function creates a unique ID for a user in order to add them to the database.
+ * @param {Integer} num The userID of the previous user in the database.
+ * @returns {String} The new UserID is returned
+ */
 function getUserId(num) {
   var new_uid = (num + 1).toString();
 
@@ -190,23 +196,23 @@ function addUserToDB(session_id, nname, ucolor) {
       var user_color = ucolor;
       var user_id = getUserId(user_count);
       var user_owner = (user_count == 0);
-    
+
       debug(user_count);
-    
+
       debug("Adding user: uid = " + user_id + ", uOwner = " + user_owner + ", uNickname = " + nickname + ", uColor = " + user_color);
-    
+
       var user = new Users({
         u_id          : user_id,
         u_owner       : Boolean,
         u_nickname    : nickname,
         u_color       : user_color
       });
-    
+
       bill_session.users.push(user);
       var subdoc = bill_session.users[user_count];
       subdoc.isNew;
       bill_session.users_count = user_count+1;
-    
+
       bill_session.save(function (err) {
         if (err) return handleError(err);
         console.log('Success!');
