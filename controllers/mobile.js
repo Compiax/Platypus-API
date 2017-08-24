@@ -156,6 +156,11 @@ function generateBillID() {
     }
   }
 
+/**
+ * This method searches the databse to find the specified bill object.
+ * @param {bill_id} bill_id_temp The ID of the bill to search for.
+ * @returns The bill ID if found, and the boolean false otherwise.
+ */
   Bills.find({ bill_id : bill_id_temp}).exec(function(err, res) {
     if (res.length || err != null) {
       console.log('Error: Session ID exists!');
