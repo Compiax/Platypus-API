@@ -10,6 +10,7 @@ var multer          = require('multer');
 var passport        = require('passport');
 var session         = require('express-session');
 var routes          = require('../routes');
+var sockets         = require('../controllers/socket');
 // Init of Redis
 var MongoStore      = require('connect-mongo')(session);
 
@@ -62,6 +63,8 @@ var init = function(config){
 
   debug('Adding generic error middleware');
   app.use(errors);
+
+  // sockets.initSocket();
 
   return app;
 };

@@ -2,13 +2,17 @@
  * @file This file implements the defined routes for use by the mobile
  * componant.
  */
-
+var mongoose    = require('mongoose');
 var Bills     = require('../models/bills');
 var Users     = require('../models/users');
+var Items       = require('../models/items');
 var debug     = require('debug')('platypus-api:controllers:mobile');
 var fs        = require('fs');
 var multer    = require('multer');
 var ocr       = require('./ocr');
+//var io        = require('socket.io').listen(3002);
+var MTypes      = mongoose.Types;
+var Schema      = mongoose.Schema;
 
 debug('Exporting method: createSession');
 /**
@@ -28,9 +32,11 @@ module.exports.createSession = function(req, res, next){
   debug("Nickname: " + nickname + ", Color: " + user_color, ", For bill ID: " + b_id);
   
   var bill = new Bills({
+    _id         : new MTypes.ObjectId(),
     bill_id     : b_id,
     bill_image  : "",
     users_count : 0,
+    items_count : 0,
     users       : [],
     bill_items  : []
   });
@@ -89,7 +95,6 @@ debug("Exporting method sendImage");
  */
 module.exports.sendImage = function(req, res, next){
   debug("Image function called");
-
   var tmp_path = req.file.path;
   var target_path = './uploads/' + req.file.originalname;
   fs.rename(tmp_path, target_path, function(err) {
@@ -98,17 +103,16 @@ module.exports.sendImage = function(req, res, next){
           if (err) throw err;
           // TODO: Function call to OCR module
           debug('File uploaded to: ' + target_path + ' - ' + req.file.size + ' bytes');
-          ocr.detect(target_path,req.body.session_id);
+          ocr.detect(target_path,req.body.session_id).then((data)=>{
+            populateItems(data.data.attributes.items, req.body.session_id);
+            var query = Bills.where({bill_id: req.body.session_id});
+            query.update({$set: {bill_image : req.file.originalname}}).exec();
+          
+            debug('Sending response (status: 200)');
+            res.status(200).send("Success");
+          });
       });
   });
-
-  var query = Bills.where({bill_id: req.body.session_id});
-  query.update({$set: {bill_image : req.file.originalname}}).exec();
-
-
-
-  debug('Sending response (status: 200)');
-  res.status(200).send("Success");
 }
   
 /**
@@ -189,7 +193,7 @@ function addUserToDB(session_id, nname, ucolor) {
       var user_count = bill_session.users_count;
       var nickname = nname;
       var user_color = ucolor;
-      var user_id = getUserId(user_count);
+      var user_id = session_id+getUserId(user_count);
       var user_owner = (user_count == 0);
     
       debug(user_count);
@@ -197,6 +201,7 @@ function addUserToDB(session_id, nname, ucolor) {
       debug("Adding user: uid = " + user_id + ", uOwner = " + user_owner + ", uNickname = " + nickname + ", uColor = " + user_color);
     
       var user = new Users({
+        _id         : new MTypes.ObjectId(),
         u_id          : user_id,
         u_owner       : Boolean,
         u_nickname    : nickname,
@@ -210,9 +215,74 @@ function addUserToDB(session_id, nname, ucolor) {
     
       bill_session.save(function (err) {
         if (err) return handleError(err);
+        user.save(function(err){
+          if (err) return handleError(err);
+        });
       });
       debug("Added obj: " + bill_session.users[user_count-1]);
       resolve(user_id);
     });
   });
+}
+
+module.exports.getAllSessionData = function(req, res, next){
+  var session = req.body.session_id;
+  // @todo: Fix item limit
+  Bills.findOne({bill_id: session}).populate({path:'bill_items'}).exec(function(err, sess){
+    debug("sess:");
+    debug(sess);
+    var response = {
+      data: {
+        type: 'session_data',
+        id: 0,
+        attributes: {
+          items: sess.bill_items
+        }
+      }
+    };
+    debug("SessionData");
+    debug(response.data.attributes.items);
+    debug('Sending response (status: 200)');
+    return res.status(200).send(response);
+  });
+}
+
+function populateItems(items, session_id) {
+  Bills.findOne({bill_id: session_id}, function(err, doc){
+      items.forEach(function(iter) {
+          debug("Loop runs");
+          var itid = session_id+getItemId(doc.items_count);
+          var item = new Items({
+              _id           : new MTypes.ObjectId(),
+              i_id       : itid,
+              i_name     : iter.desc,
+              i_quantity : iter.quantity,
+              i_price    : iter.price
+          });
+          doc.bill_items.push(item);
+          var subdoc = doc.bill_items[doc.items_count];
+          subdoc.isNew;
+          doc.items_count += 1;
+          item.save(function(err){
+            if (err) return handleError(err);
+          });
+      });
+      doc.save(function (err) {
+          if (err) return handleError(err);
+      });
+      debug("Added item: " + doc.items_count);
+      debug(doc.bill_items);
+  });
+}
+
+function getItemId(num) {
+  var new_iID = (num + 1).toString();
+
+  if (new_iID.length < 2) {
+      new_iID = 'i0' + new_iID;
+  }
+  else {
+      new_iID = 'i' + new_iID;
+  }
+  return new_iID;
 }

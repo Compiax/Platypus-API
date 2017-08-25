@@ -28,6 +28,7 @@ COPY . .
 
 # Expose ports
 EXPOSE 3000
+EXPOSE 3002
 
 # Command
 CMD ["npm", "start"]
