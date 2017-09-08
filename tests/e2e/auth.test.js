@@ -2,8 +2,7 @@ var assert          = require('assert');
 var bcrypt          = require('bcryptjs');
 var debug           = require('debug')('platypus-api:e2e:auth');
 var request         = require('supertest');
-var Token           = require('../../models/token');
-var User            = require('../../models/user');
+var User            = require('../../models/users');
 
 module.exports.test = function(app){
   describe('auth =>', function() {
