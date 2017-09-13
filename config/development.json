@@ -1,6 +1,6 @@
 {
   "cors": {
-    "origin": "https://dev.api.split-bill.co.za",
+    "origin": "http://dev.api.split-bill.co.za",
     "methods": [
       "GET",
       "POST",
