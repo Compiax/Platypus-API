@@ -1,8 +1,7 @@
 {
   "cors": {
     "origin": [
-      "https://platypus.com",
-      "https://www.platypus.com"
+      "https://api.split-bill.co.za"
     ],
     "methods": [
       "GET",
