@@ -1,6 +1,6 @@
 {
   "cors": {
-    "origin": "https://dev.platypus.com",
+    "origin": "https://dev.api.split-bill.co.za",
     "methods": [
       "GET",
       "POST",
