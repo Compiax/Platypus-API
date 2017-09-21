@@ -28,5 +28,10 @@ router.post('/sendImage', mobile.sendImage);
  */
 router.post('/terminateSession', mobile.terminateSession);
 
+/**
+ * Define route for the terminateSession function.
+ */
+router.post('/getAllSessionData', mobile.getAllSessionData);
+
 debug('Mobile router exported');
 module.exports = router;

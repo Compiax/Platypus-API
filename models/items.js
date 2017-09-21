@@ -7,12 +7,12 @@ var ObjectId    = mongoose.Schema.Types.ObjectId;
 var Schema      = mongoose.Schema;
 
 debug('Defining schema: Session');
-var Items = new Schema({
-  item_id       : String,
-  item_name     : String,
-  item_quantity : Number,
-  item_price    : Number,
-  claimed_by    : [String]
+var Items = Schema({
+  _id           : ObjectId,
+  i_id       : String,
+  i_name     : String,
+  i_quantity : Number,
+  i_price    : Number
 });
 
 debug('Items model exported');
