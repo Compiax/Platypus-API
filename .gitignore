@@ -11,7 +11,6 @@
 # Node
 /node_modules
 /npm-*.log
-
+/nbproject/private/
 \.idea/
-
 *.jpg

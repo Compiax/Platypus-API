@@ -7,5 +7,5 @@ Build status:
 
 | branch | status |
 | ------ | ------ |
-| master | @todo Add travis build status |
-| dev    | @todo Add travis build status |
+| master | [![Build Status](https://travis-ci.org/Compiax/Platypus-API.svg?branch=master)](https://travis-ci.org/Compiax/Platypus-API) |
+| dev    | [![Build Status](https://travis-ci.org/Compiax/Platypus-API.svg?branch=dev)](https://travis-ci.org/Compiax/Platypus-API) |

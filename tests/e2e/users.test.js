@@ -1,88 +1,28 @@
 var assert = require('assert');
+var request = require('supertest');
 
 module.exports.test = function(){
-  describe('users =>', function() {
-    describe('GET /users =>', function() {
-      it('should browse users and return a list of users in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
-      });
-    });
+  describe('session creation =>', function() {
+    describe('POST /mobile/createSession =>', function() {
+      var agent = request.agent(app);
 
-    describe('POST /users =>', function() {
-      it('should create a user and return that user in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
-      });
-    });
+      it('Create session test', function(done) {
+        agent
+          .post('/mobile/createSession')
+          .send({
+            username: 'testuser',
+            color: 'RGB(255,255,255)'
+          })
+          .type('form')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res){
+            if (err) return done(err);
+            done();
+          });
 
-    describe('GET /users/:id =>', function() {
-      it('should return a user in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
-      });
-    });
-
-    describe('PATCH /users/:id =>', function() {
-      it('should update a user and return that user in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
-      });
-    });
-
-    describe('DELETE /users/:id =>', function() {
-      it('should delete a user and return that user in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
-      });
-    });
-
-    describe('GET /users/:id/ideas =>', function() {
-      it('should return a list of a user\'s ideas in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
-      });
-    });
-
-    describe('GET /users/:id/submissions =>', function() {
-      it('should return a list of a user\'s submissions in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
-      });
-    });
-
-    describe('GET /users/:id/history =>', function() {
-      it('should return a user\'s history in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
-      });
-    });
-
-    describe('GET /users/:id/transactions =>', function() {
-      it('should return a list of a user\'s transactions in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
-      });
-    });
-
-    describe('GET /users/:id/wallet =>', function() {
-      it('should return a user\'s wallet in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
-      });
-    });
-
-    describe('GET /users/:id/profile =>', function() {
-      it('should return a user\'s profile in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
-      });
-    });
-
-    describe('GET /users/:id/votes =>', function() {
-      it('should return a list of a user\'s votes in jsonapi format', function() {
-        // @TODO
-        assert.equal(true, true);
+          //assert.equals(response.data.attributes.session_id, "")
       });
     });
   });

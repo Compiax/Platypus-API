@@ -1,8 +1,7 @@
 {
   "cors": {
     "origin": [
-      "https://platypus.com",
-      "https://www.platypus.com"
+      "http://api.split-bill.co.za"
     ],
     "methods": [
       "GET",
@@ -23,6 +22,10 @@
     "db": {
       "host": "platypus-db-prod",
       "database": "platypus"
+    },
+    "ocr": {
+      "host": "platypus-ocr-prod",
+      "port": "3001"
     }
   }
 }

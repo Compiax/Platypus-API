@@ -1,6 +1,6 @@
 /**
  * @file This file implements the defined routes for use by the mobile
- * componant.
+ * componant. As well as helper functions for these routes.
  */
 var mongoose    = require('mongoose');
 var Bills     = require('../models/bills');
@@ -18,7 +18,8 @@ var mobileHelper = require('../helpers/mobile');
 debug('Exporting method: createSession');
 /**
  * Function that receives the user data (Nickname and profile color) entered
- * when a user requests a new session.
+ * when a user requests a new session. A new user is created. A new bill and
+ * session are also created. The new user is then added to the bill.
  * @param {request} req req used by Express.js to fetch data from the client.
  * @param {response} res res used by Express.js to send responses back to the
  *                       client.
@@ -31,7 +32,7 @@ module.exports.createSession = function(req, res, next){
   var b_id = mobileHelper.mobile.generateBillID();
   var user_added = "";
   debug("Nickname: " + nickname + ", Color: " + user_color, ", For bill ID: " + b_id);
-  
+
   var bill = new Bills({
     _id         : new MTypes.ObjectId(),
     bill_id     : b_id,
@@ -41,10 +42,12 @@ module.exports.createSession = function(req, res, next){
     users       : [],
     bill_items  : []
   });
-  
+
   bill.save(function(err) {
     if (err) {
-      // TODO: Create Error class for db errors
+      /**
+      *  TODO: Create Error class for db errors
+      */
       debug(err);
     }
     user_added = addUserToDB(b_id, req.body.nickname, req.body.color).then(function (uid_response) {
@@ -58,7 +61,7 @@ module.exports.createSession = function(req, res, next){
           }
         }
       };
-      
+
       debug("Session ID: " + response.data.attributes.session_id + ", User ID: " + response.data.attributes.user_id);
       debug('Sending response (status: 200)');
       return res.status(200).send(response);
@@ -66,6 +69,19 @@ module.exports.createSession = function(req, res, next){
   });
 }
 
+debug('Exporting method: joinSession');
+/**
+ * This route is called to allow a new user to join an existing session. Data
+ * is fetched from the client. addUserToDB() is then called to perform the
+ * adding of new client data to the session.
+ * @param {request} req req used by Express.js to fetch data from the client.
+ *                      Used to fetch: req.body.session_id, req.body.nickname
+ *                      and req.body.color from the client.
+ * @param {response} res res used by Express.js to send HTTP responses back to
+ *                       the client.
+ * @param {object} next
+ * @return HTTP status 200 using res.send().
+ */
 module.exports.joinSession = function(req, res, next){
   addUserToDB(req.body.session_id, req.body.nickname, req.body.color).then(function (uid_response) {
     var response = {
@@ -84,7 +100,7 @@ module.exports.joinSession = function(req, res, next){
 
 debug("Exporting method sendImage");
 /**
- * Function call to upload a file to the server. Image is saved in ./uploads
+ * Function call to upload a file to the server. Image is saved in ./uploads.
  * Image name is added to the database.
  * @param {request} req req used by Express.js to fetch data from the client.
  *                      Used to fetch session_id from req.body.session_id and
@@ -115,7 +131,7 @@ module.exports.sendImage = function(req, res, next){
       });
   });
 }
-  
+
 /**
  * This module will terminate the existing session when called.
  * @param {request} req req used by Express.js to fetch data from the client.
@@ -138,6 +154,14 @@ module.exports.terminateSession = function(req, res, next){
   res.status(200).send("Success");
 }
 
+/**
+ * This function is called to add a new user to the database for the current
+ * bill session.
+ * @param {bill_id} session_id This is the unique session ID to find the correct
+ *                             Session to add the user to.
+ * @param {String} nname This is the name of the new user.
+ * @param {String} ucolor The color selected by the user
+ */
 function addUserToDB(session_id, nname, ucolor) {
   return new Promise(function (resolve, reject) {
     var finalid = null;
@@ -153,11 +177,11 @@ function addUserToDB(session_id, nname, ucolor) {
       var user_color = ucolor;
       var user_id = session_id+mobileHelper.mobile.getUserId(user_count);
       var user_owner = (user_count == 0);
-    
+
       debug(user_count);
-    
+
       debug("Adding user: uid = " + user_id + ", uOwner = " + user_owner + ", uNickname = " + nickname + ", uColor = " + user_color);
-    
+
       var user = new Users({
         _id         : new MTypes.ObjectId(),
         u_id          : user_id,
@@ -165,12 +189,12 @@ function addUserToDB(session_id, nname, ucolor) {
         u_nickname    : nickname,
         u_color       : user_color
       });
-    
+
       bill_session.users.push(user);
       var subdoc = bill_session.users[user_count];
       subdoc.isNew;
       bill_session.users_count = user_count+1;
-    
+
       bill_session.save(function (err) {
         if (err) return handleError(err);
         user.save(function(err){
