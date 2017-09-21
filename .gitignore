@@ -11,3 +11,7 @@
 # Node
 /node_modules
 /npm-*.log
+
+\.idea/
+
+*.jpg

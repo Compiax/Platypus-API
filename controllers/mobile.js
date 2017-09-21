@@ -13,6 +13,7 @@ var ocr       = require('./ocr');
 //var io        = require('socket.io').listen(3002);
 var MTypes      = mongoose.Types;
 var Schema      = mongoose.Schema;
+var mobileHelper = require('../helpers/mobile');
 
 debug('Exporting method: createSession');
 /**
@@ -27,7 +28,7 @@ debug('Exporting method: createSession');
 module.exports.createSession = function(req, res, next){
   var nickname = req.body.nickname;
   var user_color = req.body.color;
-  var b_id = generateBillID();
+  var b_id = mobileHelper.mobile.generateBillID();
   var user_added = "";
   debug("Nickname: " + nickname + ", Color: " + user_color, ", For bill ID: " + b_id);
   
@@ -137,54 +138,11 @@ module.exports.terminateSession = function(req, res, next){
   res.status(200).send("Success");
 }
 
-debug('Adding custom schema method: generateBillsID');
-/**
- * Method to generate and store bills ID.
- */
-function generateBillID() {
-  var alphabet = 'abcdefghjklmnopqrstvwxyz';
-  var numbers = '0123456789';
-  var bill_id_temp = "";
-
-  for (var i = 0; i < 5; i++) {
-    var char_or_int = (Math.floor(Math.random() * 2));
-
-    if (char_or_int === 0) {
-      var alphabet_index = (Math.floor(Math.random() * 24));
-      bill_id_temp = bill_id_temp + alphabet.charAt(alphabet_index);
-    }
-    else {
-      var numbers_index = (Math.floor(Math.random() * 10));
-      bill_id_temp = bill_id_temp + numbers.charAt(numbers_index);
-    }
-  }
-
-  Bills.find({ bill_id : bill_id_temp}).exec(function(err, res) {
-    if (res.length || err != null) {
-      console.log('Error: Session ID exists!');
-      return false;
-    }
-  });
-  return bill_id_temp;
-};
-
-function getUserId(num) {
-  var new_uid = (num + 1).toString();
-
-  if (new_uid.length < 2) {
-    new_uid = 'u0' + new_uid;
-  }
-  else {
-    new_uid = 'u' + new_uid;
-  }
-  return new_uid;
-}
-
 function addUserToDB(session_id, nname, ucolor) {
   return new Promise(function (resolve, reject) {
     var finalid = null;
     Bills.findOne({bill_id: session_id}, function(err, doc){
-      if (err) {
+      if (err || doc===null) {
         console.log("Bill not found!");
         // TODO: Fix error handling
         return 0;
@@ -193,7 +151,7 @@ function addUserToDB(session_id, nname, ucolor) {
       var user_count = bill_session.users_count;
       var nickname = nname;
       var user_color = ucolor;
-      var user_id = session_id+getUserId(user_count);
+      var user_id = session_id+mobileHelper.mobile.getUserId(user_count);
       var user_owner = (user_count == 0);
     
       debug(user_count);
