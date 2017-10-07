@@ -39,19 +39,19 @@ module.exports.detect = function(target_path, bill) {
     var formData = {
       file: fs.createReadStream(target_path),
     };
-    request.post({url:'http://192.168.43.144' + /*+ ocr_module +*/ ':' + ocr_port + '/', formData: formData, json: true}, function optionalCallback(err, httpResponse, body) {
+    request.post({url:'http://192.168.1.110' + /*+ ocr_module +*/ ':' + ocr_port + '/', formData: formData, json: true}, function optionalCallback(err, httpResponse, body) {
       if (err) {
         debug(httpResponse);
         reject(err);
       }
       debug("Body: ");
       debug(body);
-      if(body.type == 'success') {
-        response.data.attributes.items = body.attributes.data;
-      }
-      else{
+      // if(body.type == 'success') {
+      //   response.data.attributes.items = body.attributes.data;
+      // }
+      // else{
         response.data.attributes.items = its;
-      }
+      //}
 
       debug('Sending response (status: 200)');
       resolve(response);

@@ -11,7 +11,6 @@ debug('Defining schema: Session');
 var Users = Schema({
   _id               : ObjectId,
   u_id              : String,
-  u_owner           : Boolean,
   u_nickname        : String,
   u_color           : String,
   item_claimed      : [{ type: ObjectId, ref: 'Claims' }]
