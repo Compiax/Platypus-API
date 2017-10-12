@@ -1,9 +1,9 @@
-var debug           = require('debug')('platypus-api:helpers:mobile');
-var mobile          = require('./mobile.js');
-var bill          = require('./bill.js');
+var debug			= require('debug')('platypus-api:helpers:database');
+var dbutils		= require('./dbutils.js');
+var bill			= require('./bill.js');
 
-debug('Adding helper method: generateBillID');
-module.exports.mobile = mobile;
+debug('Adding helper: dbutils');
+module.exports.dbutils = dbutils;
 
-debug('Adding helper method: generateBillID');
+debug('Adding helper: Bill');
 module.exports.bill = bill;

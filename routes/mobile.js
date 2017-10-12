@@ -23,6 +23,15 @@ router.post('/joinSession', mobile.joinSession);
  */
 router.post('/sendImage', mobile.sendImage);
 
+
+router.post('/getUsers', mobile.getUsers);
+
+
+router.post('/getOwner', mobile.getOwner);
+
+
+
+
 /**
  * Define route for the terminateSession function.
  */

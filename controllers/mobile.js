@@ -13,6 +13,7 @@ var ocr = require('./ocr');
 //var io        = require('socket.io').listen(3002);
 var MTypes = mongoose.Types;
 var mobileHelper = require('../helpers/database');
+var billHelper = require('../helpers/database').bill;
 
 debug('Exporting method: createSession');
 /**
@@ -26,44 +27,22 @@ debug('Exporting method: createSession');
  * @return JSON object containing session ID and user ID
  */
 module.exports.createSession = function (req, res, next) {
+  debug("Calling create session");
   var nickname = req.body.nickname;
   var user_color = req.body.color;
-  var b_id = mobileHelper.mobile.generateBillID();
-  var user_added = "";
-  debug("Nickname: " + nickname + ", Color: " + user_color, ", For bill ID: " + b_id);
-
-  var bill = new Bills({
-    _id: new MTypes.ObjectId(),
-    bill_id: b_id,
-    bill_image: "",
-    users_count: 0,
-    items_count: 0,
-    users: [],
-    bill_items: [],
-    bill_total: 0,
-    bill_total_claimed: 0,
-    bill_owner: ""
-  });
-
-  bill.save(function (err) {
-    if (err) {
-      /**
-       *  TODO: Create Error class for db errors
-       */
-      debug(err);
-    }
-    user_added = mobileHelper.mobile.addUserToDB(b_id, req.body.nickname, req.body.color).then(function (uid_response) {
+  billHelper.createSession().then(function(bill_session_id){
+    debug("Nickname: " + nickname + ", Color: " + user_color, ", For bill ID: " + bill_session_id);
+    billHelper.addUserToDB(bill_session_id, nickname, user_color).then(function(uid_response){
       var response = {
         data: {
           type: 'bill',
           id: 0,
           attributes: {
-            session_id: bill.bill_id,
+            session_id: bill_session_id,
             user_id: uid_response
           }
         }
       };
-
       debug("Session ID: " + response.data.attributes.session_id + ", User ID: " + response.data.attributes.user_id);
       debug('Sending response (status: 200)');
       return res.status(200).send(response);
@@ -140,6 +119,35 @@ module.exports.sendImage = function (req, res, next) {
   });
 }
 
+module.exports.getAllSessionData = function(req, res, next) {
+  // @todo THIS FUNCTION SHOULD BE CALLED getBillItems
+  var b_id = req.body.session_id;
+  billHelper.fetchBillItems(b_id).then(function (items_response) {
+    debug("getAllSessionData returns:");
+    debug("THIS FUNCTION SHOULD BE CALLED getItems:");
+    debug(items_response);
+    return res.status(200).send(items_response);
+  });
+}
+
+module.exports.getUsers = function(req, res, next) {
+  var b_id = req.body.session_id;
+  billHelper.fetchBillUsers(b_id).then(function (users_response) {
+    debug("fetchBillUsers returns:");
+    debug(users_response);
+    return res.status(200).send(users_response);
+  });
+}
+
+module.exports.getOwner = function(req, res, next) {
+  var b_id = req.body.session_id;
+  billHelper.fetchBillOwner(b_id).then(function (owner_response) {
+    debug("fetchBillOwner returns:");
+    debug(owner_response);
+    return res.status(200).send(owner_response);
+  });
+}
+
 /**
  * This module will terminate the existing session when called.
  * @param {request} req req used by Express.js to fetch data from the client.
@@ -168,7 +176,7 @@ module.exports.terminateSession = function (req, res, next) {
   res.status(200).send("Success");
 }
 
-module.exports.getAllSessionData = function (req, res, next) {
+/* module.exports.getAllSessionData = function (req, res, next) {
   var session = req.body.session_id;
   // @todo: Fix item limit
   Bills.findOne({
@@ -192,4 +200,4 @@ module.exports.getAllSessionData = function (req, res, next) {
     debug('Sending response (status: 200)');
     return res.status(200).send(response);
   });
-}
+} */
