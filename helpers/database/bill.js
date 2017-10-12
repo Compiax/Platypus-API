@@ -127,6 +127,25 @@ module.exports.removeUserFromDB = function(user_id, session_id) {
 	});
 }
 
+module.export.isSessionEmpty = function (session_id) {
+	return new promise(function (resolve) {
+		Bills.findOne({
+			bill_id: session_id
+		}, function (err, doc) {
+			var isEmpty;
+			var bill_session = doc;
+			var user_count = bill_session.users_count;
+			if(user_count == 0) {
+				isEmpty = true;
+			}
+			else {
+				isEmpty = false;
+			}
+			resolve(isEmpty);
+		});
+	});
+}
+
 module.exports.populateItems = function(items, session_id) {
   Bills.findOne({
     bill_id: session_id

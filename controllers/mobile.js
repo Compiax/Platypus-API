@@ -197,6 +197,14 @@ module.exports.leaveSession = function (req, res, next) {
   isDorment();
 }
 
+module.exports.isDorment = function (req, res, next) {
+  debug("isDorment called");
+  var session = body.req.session_id;
+  billHelper.isSessionEmpty(session).then(terminateSession(req, res, next));
+  debug('Sending response (status: 200)');
+  res.status(200).send("Success");
+}
+
 /* module.exports.getAllSessionData = function (req, res, next) {
   var session = req.body.session_id;
   // @todo: Fix item limit

@@ -31,6 +31,7 @@ router.post('/getOwner', mobile.getOwner);
 
 router.post('/leaveSession', mobile.leaveSession);
 
+router.post('/isDorment'), mobile.isDorment);
 
 /**
  * Define route for the terminateSession function.
