@@ -402,3 +402,16 @@ module.exports.billInfo = function(session_id) {
 		}
 	});
 }
+
+module.exports.getOriginalImage = function(session_id) {
+	return new promise(function(resolve) {
+		Bills.findOne({
+			bill_id: session_id
+		}).populate({
+			path: "bill_image"
+		}).exec(function (err, doc) {
+			var image = doc.bill_image;
+			resolve(image);
+		});
+	});
+}
