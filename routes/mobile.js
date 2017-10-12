@@ -29,7 +29,7 @@ router.post('/getUsers', mobile.getUsers);
 
 router.post('/getOwner', mobile.getOwner);
 
-
+router.post('/leaveSession', mobile.leaveSession);
 
 
 /**

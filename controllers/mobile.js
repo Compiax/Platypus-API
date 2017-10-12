@@ -120,7 +120,7 @@ module.exports.sendImage = function (req, res, next) {
 }
 
 module.exports.getAllSessionData = function(req, res, next) {
-  // @todo THIS FUNCTION SHOULD BE CALLED getBillItems
+  // @TODO THIS FUNCTION SHOULD BE CALLED getBillItems
   var b_id = req.body.session_id;
   billHelper.fetchBillItems(b_id).then(function (items_response) {
     debug("getAllSessionData returns:");
@@ -174,6 +174,24 @@ module.exports.terminateSession = function (req, res, next) {
   });
   debug('Sending response (status: 200)');
   res.status(200).send("Success");
+}
+
+module.exports.leaveSession = function (req, res, next) {
+  debug("Leave Session called");
+  var session = req.body.session_id;
+
+  var session = req.body.session_id;
+  var user = req.body.user_id;
+  var query = Bills.find({
+    bill_id: session
+  });
+
+  debug("Calling DB helper removeUserFromDB")
+  billHelper.removeUserFromDB(user, session).then(function(isRemoved) {
+    debug("User removed: " + isRemoved);
+    return res.status(200).send(isRemoved);
+  });
+  isDorment();
 }
 
 /* module.exports.getAllSessionData = function (req, res, next) {

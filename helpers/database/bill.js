@@ -58,7 +58,7 @@ module.exports.createSession = function () {
 module.exports.addUserToDB = function(session_id, nname, ucolor) {
 	return new Promise(function (resolve, reject) {
 		var finalid = null;
-		Bills.findOne({ bill_id: session_id }, 
+		Bills.findOne({ bill_id: session_id },
 			function (err, doc) {
 				if (err || doc === null) {
 					console.log("Bill not found!");
@@ -100,6 +100,30 @@ module.exports.addUserToDB = function(session_id, nname, ucolor) {
 				resolve(user_id);
 			}
 		);
+	});
+}
+
+module.exports.removeUserFromDB = function(user_id, session_id) {
+	debug("removing user " + user_id + " from session " + session_id);
+	return new Promise(function (resolve) {
+		var isRemoved = false;
+		Bills.findOne({
+			bill_id: session_id
+		}, function (err, doc) {
+			if (err || doc === null) {
+				console.log("Bill not found!");
+				// TODO: Fix error handling
+				return 0;
+			}
+
+			var bill_session = doc;
+			var user_count = bill_session.users_count;
+
+			//@TODO: confirm that the following line removes the user from the DB
+			bill_session.users.update({u_id: user_id}, {$unset: {field: 1}});
+			isRemoved = true;
+			resolve(isRemoved);
+		})
 	});
 }
 
@@ -270,7 +294,7 @@ module.exports.fetchBillData = function(session_id) {
 			};
 			resolve(response);
 		});
-	});	
+	});
 }
 
 module.exports.fetchBillItems = function(session_id) {
@@ -293,7 +317,7 @@ module.exports.fetchBillItems = function(session_id) {
 			};
 			resolve(response);
 		});
-	});	
+	});
 }
 
 module.exports.fetchBillUsers = function(session_id) {
@@ -316,7 +340,7 @@ module.exports.fetchBillUsers = function(session_id) {
 			};
 			resolve(response);
 		});
-	});	
+	});
 }
 
 module.exports.fetchBillOwner = function(session_id) {
@@ -339,5 +363,5 @@ module.exports.fetchBillOwner = function(session_id) {
 			};
 			resolve(response);
 		});
-	});	
+	});
 }
