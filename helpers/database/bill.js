@@ -272,6 +272,24 @@ module.exports.calculateClaimedTotal = function(session_id) {
 	});
 }
 
+module.exports.calculateUnclaimedTotal = function(session_id) {
+	var total = calculateUnclaimedTotal(session_id);
+	var claimed = calculateTotal(session_id);
+	var unclaimed = total - claimed;
+	Bills.findOne({
+		bill_id: session_id
+	}, function (err, doc) {
+		doc.bill_total_unclaimed = unclaimed;
+		doc.save(function (err) {
+			debug("Bill save error: ");
+			debug(err);
+			if (err) return handleError(err);
+			resolve(doc.bill_total_unclaimed);
+		});
+		debug("Calculated and stored unclaimed total: " + doc.bill_total_unclaimed);
+	});
+}
+
 module.exports.fetchBillData = function(session_id) {
 	return new Promise(function (resolve) {
 		Bills.findOne({
