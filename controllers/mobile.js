@@ -74,6 +74,9 @@ module.exports.joinSession = function (req, res, next) {
         }
       }
     };
+    debug("getting bill info")
+    var info = billHelper.billInfo(req.body.session_id);
+    //@TODO correct way to return the bill info to client?
     debug('Sending response (status: 200)');
     return res.status(200).send(response);
   });
