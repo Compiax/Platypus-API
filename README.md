@@ -1,7 +1,7 @@
 Platypus-API
 =====================
 
-@todo Add description
+Responsible for front-end functionality, data flow, storage and communication.
 
 Build status:
 
