@@ -403,25 +403,6 @@ module.exports.fetchBillOwner = function(session_id) {
 	});
 }
 
-module.exports.billInfo = function(session_id) {
-	return new promise(function(resolve) {
-		var _total = calculateTotal(session_id);
-		var _unclaimed = calculateUnclaimedTotal(session_id);
-		var _owner = fetchBillOwner(session_id);
-
-		//@TODO confirm correct syntax of info object to be returned
-		var info = {
-			total: _total,
-			unclaimed: _unclaimed,
-			owner: _owner
-			}
-			//@TODO is this line necessary?
-			JSON.stringify(info);
-			resolve(info);
-		}
-	});
-}
-
 module.exports.getOriginalImage = function(session_id) {
 	return new promise(function(resolve) {
 		Bills.findOne({
