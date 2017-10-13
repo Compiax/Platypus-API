@@ -9,8 +9,8 @@ var ObjectId    = mongoose.Schema.Types.ObjectId;
 debug('Defining schema: Claims');
 var Claims = Schema({
   _id       : ObjectId,
-  item_id       : String,
-  quantity : Number
+  item_id   : String,
+  quantity  : Number
 });
 
 module.exports = mongoose.model('Claims', Claims);
