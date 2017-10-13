@@ -163,6 +163,32 @@ module.exports.validateSessionData = function(req, res, next) {
   });
 }
 
+module.exports.leaveSession = function (req, res, next) {
+  debug("Leave Session called");
+  var session = req.body.session_id;
+
+  var session = req.body.session_id;
+  var user = req.body.user_id;
+  var query = Bills.find({
+    bill_id: session
+  });
+
+  debug("Calling DB helper removeUserFromDB")
+  billHelper.removeUserFromDB(user, session).then(function(isRemoved) {
+    debug("User removed: " + isRemoved);
+    return res.status(200).send(isRemoved);
+  });
+  //isDorment();
+}
+
+module.exports.isDorment = function (req, res, next) {
+  debug("isDorment called");
+  var session = body.req.session_id;
+  billHelper.isSessionEmpty(session).then(terminateSession(req, res, next));
+  debug('Sending response (status: 200)');
+  res.status(200).send("Success");
+}
+
 module.exports.fetchUserClaims = function(req, res, next) {
   var user_id = req.body.u_id;
   billHelper.fetchUserClaims(user_id).then(function(claims_response) {

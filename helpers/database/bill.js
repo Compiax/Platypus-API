@@ -56,7 +56,7 @@ module.exports.createSession = function () {
 module.exports.addUserToDB = function(session_id, nname, ucolor) {
 	return new Promise(function (resolve, reject) {
 		var finalid = null;
-		Bills.findOne({ bill_id: session_id }, 
+		Bills.findOne({ bill_id: session_id },
 			function (err, doc) {
 				if (err || doc === null) {
 					console.log("Bill not found!");
@@ -102,6 +102,49 @@ module.exports.addUserToDB = function(session_id, nname, ucolor) {
 				resolve(user_id);
 			}
 		);
+	});
+}
+
+module.exports.removeUserFromDB = function(user_id, session_id) {
+	debug("removing user " + user_id + " from session " + session_id);
+	return new Promise(function (resolve) {
+		var isRemoved = false;
+		Bills.findOne({
+			bill_id: session_id
+		}, function (err, doc) {
+			if (err || doc === null) {
+				console.log("Bill not found!");
+				// TODO: Fix error handling
+				return 0;
+			}
+
+			var bill_session = doc;
+			var user_count = bill_session.users_count;
+
+			//@TODO: confirm that the following line removes the user from the DB
+			bill_session.users.update({u_id: user_id}, {$unset: {field: 1}});
+			isRemoved = true;
+			resolve(isRemoved);
+		})
+	});
+}
+
+module.export.isSessionEmpty = function (session_id) {
+	return new promise(function (resolve) {
+		Bills.findOne({
+			bill_id: session_id
+		}, function (err, doc) {
+			var isEmpty;
+			var bill_session = doc;
+			var user_count = bill_session.users_count;
+			if(user_count == 0) {
+				isEmpty = true;
+			}
+			else {
+				isEmpty = false;
+			}
+			resolve(isEmpty);
+		});
 	});
 }
 
@@ -311,17 +354,9 @@ module.exports.editItem = function(data) {
 				debug("Bill Total: ");
 				debug(doc.bill_total);
 				doc.bill_total -= oldPrice;
-				debug("Bill Total: ");
-				debug(doc.bill_total);
 				doc.bill_unclaimed_total -= oldPrice;
-				debug("Bill Total: ");
-				debug(doc.bill_total);
 				doc.bill_total += parseFloat(data.price);
-				debug("Bill Total: ");
-				debug(doc.bill_total);
 				doc.bill_unclaimed_total -= data.price;
-				debug("Bill Total: ");
-				debug(doc.bill_total);
 				doc.save(function (err) {
 					if (err) return handleError(err);
 					item.save(function (err) {
@@ -423,6 +458,24 @@ module.exports.calculateClaimedTotal = function(session_id) {
 	});
 }
 
+module.exports.calculateUnclaimedTotal = function(session_id) {
+	var total = calculateUnclaimedTotal(session_id);
+	var claimed = calculateTotal(session_id);
+	var unclaimed = total - claimed;
+	Bills.findOne({
+		bill_id: session_id
+	}, function (err, doc) {
+		doc.bill_total_unclaimed = unclaimed;
+		doc.save(function (err) {
+			debug("Bill save error: ");
+			debug(err);
+			if (err) return handleError(err);
+			resolve(doc.bill_total_unclaimed);
+		});
+		debug("Calculated and stored unclaimed total: " + doc.bill_total_unclaimed);
+	});
+}
+
 module.exports.fetchBillData = function(session_id) {
 	return new Promise(function (resolve) {
 		Bills.findOne({
@@ -445,7 +498,7 @@ module.exports.fetchBillData = function(session_id) {
 			};
 			resolve(response);
 		});
-	});	
+	});
 }
 
 module.exports.fetchBillItems = function(session_id) {
@@ -470,7 +523,7 @@ module.exports.fetchBillItems = function(session_id) {
 			};
 			resolve(response);
 		});
-	});	
+	});
 }
 
 module.exports.fetchBillUsers = function(session_id) {
@@ -493,7 +546,7 @@ module.exports.fetchBillUsers = function(session_id) {
 			};
 			resolve(response);
 		});
-	});	
+	});
 }
 
 module.exports.fetchBillOwner = function(session_id) {
@@ -538,6 +591,19 @@ module.exports.fetchUserClaims = function(userId) {
 				}
 			};
 			resolve(response);
+		});
+	});
+}
+
+module.exports.getOriginalImage = function(session_id) {
+	return new promise(function(resolve) {
+		Bills.findOne({
+			bill_id: session_id
+		}).populate({
+			path: "bill_image"
+		}).exec(function (err, doc) {
+			var image = doc.bill_image;
+			resolve(image);
 		});
 	});
 }
