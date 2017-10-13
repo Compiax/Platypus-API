@@ -129,7 +129,7 @@ module.exports.removeUserFromDB = function(user_id, session_id) {
 	});
 }
 
-module.export.isSessionEmpty = function (session_id) {
+module.exports.isSessionEmpty = function (session_id) {
 	return new promise(function (resolve) {
 		Bills.findOne({
 			bill_id: session_id
@@ -272,7 +272,7 @@ module.exports.claimItem = function (data) {
 				user.save();
 			}
 		});
-	
+
 		Items.findOne({
 			i_id: data.item_id
 		}, function (err, item) {
@@ -568,7 +568,7 @@ module.exports.fetchBillOwner = function(session_id) {
 				};
 				resolve(response);
 		});
-	});	
+	});
 }
 
 module.exports.fetchUserClaims = function(userId) {
@@ -677,6 +677,6 @@ module.exports.validateSessionData = function (session, user) {
 			};
 			resolve(responseF);
 		});
-	});	
+	});
 	return true;
 }
