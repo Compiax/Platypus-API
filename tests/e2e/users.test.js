@@ -55,7 +55,29 @@ module.exports.test = function(){
     describe('POST /mobile/getAllSessionData =>', function() {
       it('Getting All Session Data test', function(done){
         agent
-          .post('/mobile.getAllSessionData')
+          .post('/mobile/getAllSessionData')
+          .send({
+            session_id: 'xxxxx'
+          })
+          .type('form')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', 'text/html; charset=utf-8')
+          .expect(200)
+          .expect(404)
+          .end(function(err, res){
+            if(err) return done(err);
+            done();
+          });
+          done();
+      });
+    });
+  });
+
+  describe('getItems =>', function(){
+    describe('POST /mobile/getItems =>', function (){
+      it('Getting Items', function(done){
+        agent
+          .post('/mobile/getItems')
           .send({
             session_id: 'xxxxx'
           })
@@ -63,13 +85,38 @@ module.exports.test = function(){
           .set('Accept', 'application/json')
           .expect('Content-Type', 'text/html; charset=utf-8')
           .expect(404)
+          .expect(200)
           .end(function(err, res){
             if(err) return done(err);
             done();
           });
+          done();
       });
     });
   });
+
+  describe('getUsers =>', function(){
+    describe('POST /mobile/getUsers =>', function (){
+      it('Getting Users', function(done){
+        agent
+          .post('/mobile/getUsers')
+          .send({
+            session_id: 'xxxxx'
+          })
+          .type('form')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', 'text/html; charset=utf-8')
+          .expect(404)
+          .expect(200)
+          .end(function(err, res){
+            if(err) return done(err);
+            done();
+          });
+          done();
+      });
+    });
+  });
+
 };
 
 /*
