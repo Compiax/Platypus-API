@@ -37,7 +37,7 @@ module.exports.test = function(){
         agent
           .post('/mobile/joinSession')
           .send({
-            session_id: 'xxxxx'
+            session_id: 'xxxxx',
             username: 'testuser',
             color: 'RGB(255,255,255)'
           })
@@ -49,8 +49,32 @@ module.exports.test = function(){
             if (err) return done(err);
             done();
           });
-
           //assert.equals(response.data.attributes.session_id, "")
+      });
+    });
+  });
+};
+
+module.exports.test = function() {
+  describe('sesion terminating =>', function(){
+    describe('POST /mobile/terminateSession =>', function() {
+      var agent = request.agent(app);
+
+      it('Terminate Session Test', function(done) {
+        agent
+          .post('mobile/terminateSession')
+          .send({
+            session_id: 'xxxxx'
+          })
+          .type('form')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function (err, res) {
+            if (err) return done(err);
+            done();
+          });
+          //assert.equals(response.data.attributes.session_id, "");
       });
     });
   });
