@@ -53,7 +53,7 @@ debug('Exporting method: joinSession');
  * @param {response} res res used by Express.js to send HTTP responses back to
  *                       the client.
  * @param {object} next
- * @return HTTP status 200 using res.send().
+ * @return JSON object containing new User ID and Bill object.
  */
 module.exports.joinSession = function (req, res, next) {
   billHelper.fetchBillData(req.body.session_id).then(function(bill_object){
@@ -77,7 +77,9 @@ module.exports.joinSession = function (req, res, next) {
 debug("Exporting method sendImage");
 /**
  * Function call to upload a file to the server. Image is saved in ./uploads.
- * Image name is added to the database.
+ * Image name is added to the database. OCR module is informed of the image 
+ * file. Character recognition is performed and a text response is received
+ * from OCR module, and processed
  * @param {request} req req used by Express.js to fetch data from the client.
  *                      Used to fetch session_id from req.body.session_id and
  *                      the file name from req.body.originalname.
@@ -105,6 +107,18 @@ module.exports.sendImage = function (req, res, next) {
   });
 }
 
+debug("Exporting method getAllSessionData");
+/**
+ * Function to featch data from database.
+ * @param {request} req req used by Express.js to fetch data from the client.
+ *                      Used to fetch session_id from req.body.session_id and
+ *                      the file name from req.body.originalname.
+ * @param {response} res res used by Express.js to send responses back to the
+ *                       client.
+ * @param {object} next
+ * @return HTTP status 200 using res.send(). Returns a JSON object containing
+ * Session Data
+ */
 module.exports.getAllSessionData = function(req, res, next) {
   var b_id = req.body.session_id;
   billHelper.fetchBillItems(b_id).then(function (items_response) {

@@ -48,7 +48,8 @@ function unclaimItem(data) {
 
 function deleteItem(data) {
 	billHelper.deleteItem(data).then(function(item_response) {
-		sendItem(item_response.item, data.session_id);
+		debug("Delete Item Called");
+		sendRemoveItem(item_response.i_id, data.session_id);
 		sendTotal(item_response.new_total, data.session_id);
 		sendUnclaimedTotal(item_response.new_unclaimed_total, data.session_id);
 	});
@@ -123,7 +124,7 @@ function sendUnclaimedTotal(utotal, session_id) {
 
 function sendRemoveItem(item_id, session_id) {
 	debug("Sending RemoveItem for session: " + session_id);
-	debug(item);
+	debug(item_id);
 	var response = {
 		data: {
 			type: 'updated_unclaimed_total',

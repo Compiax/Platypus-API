@@ -38,9 +38,6 @@ module.exports.createSession = function () {
 
 		bill.save(function (err) {
 			if (err) {
-				/**
-				 *  TODO: Create Error class for db errors
-				 */
 				debug(err);
 			}
 				resolve (b_id);
@@ -77,6 +74,8 @@ module.exports.addUserToDB = function(session_id, nname, ucolor) {
 				debug(user_count);
 				debug("Adding user: uid = " + user_id + ", uOwner = " + user_owner + ", uNickname = " + nickname + ", uColor = " + user_color);
 
+				debug("UNCLAIMED TOTAL");
+				debug(doc.bill_unclaimed_total);
 				var user = new Users({
 					_id: new MTypes.ObjectId(),
 					u_id: user_id,
@@ -302,16 +301,27 @@ module.exports.editItem = function(data) {
 			item.i_name = data.name;
 			item.i_quantity = data.quantity;
 			item.i_price = data.price;
+			debug(oldPrice + " " + item.i_name + " " + item.i_quantity + " " + item.i_price);
 			item.save(function (err) {
 				if (err) return handleError(err);
 				});
 			Bills.findOne({
 				bill_id: data.session_id
 			}, function (err, doc) {
+				debug("Bill Total: ");
+				debug(doc.bill_total);
 				doc.bill_total -= oldPrice;
+				debug("Bill Total: ");
+				debug(doc.bill_total);
 				doc.bill_unclaimed_total -= oldPrice;
-				doc.bill_total += data.price;
+				debug("Bill Total: ");
+				debug(doc.bill_total);
+				doc.bill_total += parseFloat(data.price);
+				debug("Bill Total: ");
+				debug(doc.bill_total);
 				doc.bill_unclaimed_total -= data.price;
+				debug("Bill Total: ");
+				debug(doc.bill_total);
 				doc.save(function (err) {
 					if (err) return handleError(err);
 					item.save(function (err) {
@@ -323,6 +333,7 @@ module.exports.editItem = function(data) {
 					new_total	 : doc.bill_total,
 					new_unclaimed_total : doc.bill_unclaimed_total
 				};
+				debug(response);
 				resolve(response);
 			});
 		});
@@ -335,29 +346,36 @@ module.exports.deleteItem = function(data) {
 		var itemIdToRemove = null;
 		var claimIdToRemove = null;
 		var priceToDeduct = 0;
+		var i_idToRemove = "";
+		var nTotal = 0;
+		var nUnclaimed = 0;
 		Items.findOne({i_id: data.item_id}, function(err, item){
+			debug("Found item");
+			debug(item.i_id);
 			itemIdToRemove = item._id;
+			i_idToRemove = item.i_id;
 			priceToDeduct = item.i_price;
 		});
 		Claims.find({item_id: data.item_id}).remove().exec();
-		Bills.findOne({
-			bill_id: session_id
-		}, function (err, doc) {
-			doc.bill_items.id(itemIdToRemove).remove();
-			doc.items_count -= 1;
-			doc.bill_total -= priceToDeduct;
-			doc.bill_unclaimed_total -= priceToDeduct;
-			doc.save(function (err) {
+		Bills.findOne({bill_id: data.session_id}, function(err, bill){
+			bill.items_count -= 1;
+			bill.bill_total -= priceToDeduct;
+			nTotal = bill.bill_total;
+			bill.bill_unclaimed_total -= priceToDeduct;
+			nUnclaimed = bill.bill_unclaimed_total;
+			bill.bill_items.pull({_id: itemIdToRemove});
+			bill.save(function (err) {
 				if (err) return handleError(err);
-				item.save(function (err) {
-					if (err) return handleError(err);
-				});
 			});
+		});
+		Bills.update({
+			bill_id: data.session_id
+		}, {"$pull": {bill_items: {_id: claimIdToRemove}}}, function (err, doc) {
 			debug("Added item: " + doc.items_count);
 			var response = {
-						i_id	:	item.i_id,
-						new_total	 : doc.bill_total,
-						new_unclaimed_total : doc.bill_unclaimed_total
+						i_id	:	i_idToRemove,
+						new_total	 : nTotal,
+						new_unclaimed_total : nUnclaimed
 					}
 			resolve(response);
 		});
@@ -554,24 +572,44 @@ module.exports.fetchUserClaims = function(userId) {
 
 module.exports.validateSessionData = function (session, user) {
 	return new Promise(function (resolve) {
-		var valid = false;
+		debug("Validating: "+session);
+		var validated = false;
 		Bills.findOne({
 			bill_id: session
 		}).populate({
 			path: 'users'
 		}).exec(function (err, doc) {
 			if(err) {
-				valid = false;
+				validated = false;
 			}
+			debug(doc);
 			doc.users.forEach(function(iter){
 				if(iter.u_id == user){
-					valid = true;
-					resolve(valid);
+					validated = true;
+					var responseT = {
+						data: {
+							type: 'validation',
+							id: 0,
+							attributes: {
+								valid: validated
+							}
+						}
+					};
+					resolve(responseT);
 				}
 			});
 			debug("session owner:");
 			debug(doc);
-			resolve(valid);
+			var responseF = {
+				data: {
+					type: 'validation',
+					id: 0,
+					attributes: {
+						valid: validated
+					}
+				}
+			};
+			resolve(responseF);
 		});
 	});	
 	return true;
