@@ -1,4 +1,3 @@
-var bcrypt      = require('bcryptjs');
 var debug       = require('debug')('platypus-api:models:users');
 var mongoose    = require('mongoose');
 var Claims      = require('./claims');

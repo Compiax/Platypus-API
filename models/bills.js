@@ -18,8 +18,7 @@ var Bills = Schema({
 	users: [{ type: ObjectId, ref: 'Users' }],
 	bill_items: [{ type: ObjectId, ref: 'Items' }],
 	bill_total: Number,
-	bill_total_claimed: Number,
-	bill_total_unclaimed: Number,
+	bill_unclaimed_total: Number,
 	bill_owner: String
 }, {
 	toJSON: { virtuals: true }

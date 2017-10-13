@@ -23,25 +23,35 @@ router.post('/joinSession', mobile.joinSession);
  */
 router.post('/sendImage', mobile.sendImage);
 
+/**
+ * Define route for the getAllSessionData function.
+ */
+router.post('/getAllSessionData', mobile.getAllSessionData);
 
-router.post('/getUsers', mobile.getUsers);
-
-
-router.post('/getOwner', mobile.getOwner);
 
 router.post('/leaveSession', mobile.leaveSession);
 
 router.post('/isDorment'), mobile.isDorment);
 
 /**
- * Define route for the terminateSession function.
+ * Define route for the getItems function.
  */
-router.post('/terminateSession', mobile.terminateSession);
+router.post('/getItems', mobile.getItems);
 
 /**
- * Define route for the terminateSession function.
+ * Define route for the getUsers function.
  */
-router.post('/getAllSessionData', mobile.getAllSessionData);
+router.post('/getUsers', mobile.getUsers);
+
+/**
+ * Define route for the getOwner function.
+ */
+router.post('/getOwner', mobile.getOwner);
+
+/**
+ * Define route for the validateSessionData function.
+ */
+router.post('/validateSessionData', mobile.validateSessionData);
 
 debug('Mobile router exported');
 module.exports = router;
