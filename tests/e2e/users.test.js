@@ -50,19 +50,26 @@ module.exports.test = function(){
       });
     });
   });
-/*
+
   describe('getAllSessionData =>', function(){
     describe('POST /mobile/getAllSessionData =>', function() {
       it('Getting All Session Data test', function(done){
         agent
           .post('/mobile.getAllSessionData')
           .send({
-
+            session_id: 'xxxxx'
           })
+          .type('form')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', 'text/html; charset=utf-8')
+          .expect(404)
+          .end(function(err, res){
+            if(err) return done(err);
+            done();
+          });
       });
     });
   });
-  */
 };
 
 /*
