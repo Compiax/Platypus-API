@@ -21,7 +21,7 @@ var init = function(config){
   var sessionSecret = config.session.secret;
 
   debug('Connecting to mongo database');
-  mongoose.connect('mongodb://' + mongoHost + '/' + mongoDatabase, { useMongoClient: true });
+  mongoose.connect('mongodb://' + mongoHost + '/' + mongoDatabase);
   var mongoStore = new MongoStore({mongooseConnection: mongoose.connection});
 
   debug('Creating application');

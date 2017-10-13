@@ -2,10 +2,9 @@ var assert = require('assert');
 var request = require('supertest');
 
 module.exports.test = function(){
-  var agent = request.agent(app.listen());
-
   describe('session creation =>', function() {
     describe('POST /mobile/createSession =>', function() {
+      var agent = request.agent(app);
       it('Create session test', function(done) {
         agent
           .post('/mobile/createSession')
@@ -29,6 +28,7 @@ module.exports.test = function(){
 
   describe('session joining =>', function() {
     describe('POST /mobile/joinSession =>', function() {
+      var agent = request.agent(app);
       it('Join session test', function(done) {
         agent
           .post('/mobile/joinSession')
@@ -53,6 +53,7 @@ module.exports.test = function(){
 
   describe('getAllSessionData =>', function(){
     describe('POST /mobile/getAllSessionData =>', function() {
+      var agent = request.agent(app);
       it('Getting All Session Data test', function(done){
         agent
           .post('/mobile/getAllSessionData')
@@ -75,6 +76,7 @@ module.exports.test = function(){
 
   describe('getItems =>', function(){
     describe('POST /mobile/getItems =>', function (){
+      var agent = request.agent(app);
       it('Getting Items', function(done){
         agent
           .post('/mobile/getItems')
@@ -97,6 +99,7 @@ module.exports.test = function(){
 
   describe('getUsers =>', function(){
     describe('POST /mobile/getUsers =>', function (){
+      var agent = request.agent(app);
       it('Getting Users', function(done){
         agent
           .post('/mobile/getUsers')
@@ -119,6 +122,7 @@ module.exports.test = function(){
 
   describe('getUsers =>', function(){
     describe('POST /mobile/getUsers =>', function (){
+      var agent = request.agent(app);
       it('Getting Users', function(done){
         agent
           .post('/mobile/getUsers')
