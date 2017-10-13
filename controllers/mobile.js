@@ -2,17 +2,9 @@
  * @file This file implements the defined routes for use by the mobile
  * componant. As well as helper functions for these routes.
  */
-var mongoose = require('mongoose');
-var Bills = require('../models/bills');
-var Users = require('../models/users');
-var Items = require('../models/items');
 var debug = require('debug')('platypus-api:controllers:mobile');
 var fs = require('fs');
-var multer = require('multer');
 var ocr = require('./ocr');
-//var io        = require('socket.io').listen(3002);
-var MTypes = mongoose.Types;
-var mobileHelper = require('../helpers/database');
 var billHelper = require('../helpers/database').bill;
 
 debug('Exporting method: createSession');
@@ -64,18 +56,21 @@ debug('Exporting method: joinSession');
  * @return HTTP status 200 using res.send().
  */
 module.exports.joinSession = function (req, res, next) {
-  mobileHelper.mobile.addUserToDB(req.body.session_id, req.body.nickname, req.body.color).then(function (uid_response) {
-    var response = {
-      data: {
-        type: 'bill',
-        id: 0,
-        attributes: {
-          user_id: uid_response
+  billHelper.fetchBillData(req.body.session_id).then(function(bill_object){
+    billHelper.addUserToDB(req.body.session_id, req.body.nickname, req.body.color).then(function (uid_response) {
+      var response = {
+        data: {
+          type: 'bill',
+          id: 0,
+          attributes: {
+            user_id: uid_response,
+            bill: bill_object
+          }
         }
-      }
-    };
-    debug('Sending response (status: 200)');
-    return res.status(200).send(response);
+      };
+      debug('Sending response (status: 200)');
+      return res.status(200).send(response);
+    });
   });
 }
 
@@ -99,32 +94,30 @@ module.exports.sendImage = function (req, res, next) {
     if (err) throw err;
     fs.unlink(tmp_path, function () {
       if (err) throw err;
-      // TODO: Function call to OCR module
       debug('File uploaded to: ' + target_path + ' - ' + req.file.size + ' bytes');
       ocr.detect(target_path, req.body.session_id).then((data) => {
-        mobileHelper.bill.populateItems(data.data.attributes.items, req.body.session_id);
-        var query = Bills.where({
-          bill_id: req.body.session_id
+        billHelper.populateItems(data.data.attributes.items, req.body.session_id, req.file.originalname).then(function (){
+          debug('Sending response (status: 200)');
+          res.status(200).send("Success");
         });
-        query.update({
-          $set: {
-            bill_image: req.file.originalname
-          }
-        }).exec();
-
-        debug('Sending response (status: 200)');
-        res.status(200).send("Success");
       });
     });
   });
 }
 
 module.exports.getAllSessionData = function(req, res, next) {
-  // @todo THIS FUNCTION SHOULD BE CALLED getBillItems
   var b_id = req.body.session_id;
   billHelper.fetchBillItems(b_id).then(function (items_response) {
     debug("getAllSessionData returns:");
-    debug("THIS FUNCTION SHOULD BE CALLED getItems:");
+    debug(items_response);
+    return res.status(200).send(items_response);
+  });
+}
+
+module.exports.getItems = function(req, res, next) {
+  var b_id = req.body.session_id;
+  billHelper.fetchBillItems(b_id).then(function (items_response) {
+    debug("getItems returns:");
     debug(items_response);
     return res.status(200).send(items_response);
   });
@@ -148,56 +141,17 @@ module.exports.getOwner = function(req, res, next) {
   });
 }
 
-/**
- * This module will terminate the existing session when called.
- * @param {request} req req used by Express.js to fetch data from the client.
- *                      Session is fetched from req.body.session_id.
- * @param {response} res res used by Express.js to send responses back to the
- *                       client.
- * @param {object} next
- * @returns HTTP status 200 using res.send().
- */
-module.exports.terminateSession = function (req, res, next) {
-  debug("Terminate Session called");
-
+module.exports.validateSessionData = function(req, res, next) {
   var session = req.body.session_id;
-  var query = Bills.find({
-    bill_id: session
+  var user = req.body.user_id;
+  billHelper.validateSessionData(session, user).then(function(valid_response) {
+    return valid_response;
   });
-
-  query.remove({
-    users: {
-      $size: 0
-    }
-  }, function (err) {
-    if (err) return handleError(err);
-  });
-  debug('Sending response (status: 200)');
-  res.status(200).send("Success");
 }
 
-/* module.exports.getAllSessionData = function (req, res, next) {
-  var session = req.body.session_id;
-  // @todo: Fix item limit
-  Bills.findOne({
-    bill_id: session
-  }).populate({
-    path: 'bill_items'
-  }).exec(function (err, sess) {
-    debug("sess:");
-    debug(sess);
-    var response = {
-      data: {
-        type: 'session_data',
-        id: 0,
-        attributes: {
-          items: sess.bill_items
-        }
-      }
-    };
-    debug("SessionData");
-    debug(response.data.attributes.items);
-    debug('Sending response (status: 200)');
-    return res.status(200).send(response);
+module.exports.fetchUserClaims = function(req, res, next) {
+  var user_id = req.body.u_id;
+  billHelper.fetchUserClaims(user_id).then(function(claims_response) {
+    return res.status(200).send(claims_response);
   });
-} */
+}

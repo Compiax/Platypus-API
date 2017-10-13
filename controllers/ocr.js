@@ -6,12 +6,17 @@ var debug       = require('debug')('platypus-api:controllers:ocr');
 var fs          = require('fs');
 var request     = require('request');
 
-var its =   [{price: '43.50', quantity: '5', desc: "Cheese Burger", id: '6'},
-{price: '24.90', quantity: '2', desc: "Milkshake", id: '1'},
-{price: '18.00', quantity: '3', desc: "Filter Coffee", id: '2'},
-{price: '25.90', quantity: '2', desc: "Toasted Cheese", id: '3'},
-{price: '5.90', quantity: '1', desc: "Extra Bacon", id: '4'},
-{price: '32.90', quantity: '1', desc: "Chicken Wrap", id: '5'}];
+var its = [	{price: '36.00', quantity: '3', desc: "Add Portion Chi", id: '1'},
+{price: '24.00', quantity: '1', desc: "S/Wich Bacon, A", id: '2'},
+{price: '36.00', quantity: '1', desc: "Trami Chic P/De", id: '3'},
+{price: '38.00', quantity: '1', desc: "Bacon Avo & Pep", id: '4'},
+{price: '35.00', quantity: '1', desc: "Cheese Burger", id: '5'},
+{price: '55.00', quantity: '1', desc: "Chic Schnitzel", id: '6'},
+{price: '10.00', quantity: '1', desc: "Tea Rooibos", id: '7'},
+{price: '20.00', quantity: '1', desc: "Americano Dbl", id: '8'},
+{price: '32.00', quantity: '2', desc: "330Ml Coke", id: '9'},
+{price: '16.00', quantity: '1', desc: "200Ml Tonic Wat", id: '10'},
+{price: '7.00', quantity: '1', desc: "Lime Cordial", id: '11'}];
 
 /**
  * @TODO Once this method is correctly implemented complete documentation.
