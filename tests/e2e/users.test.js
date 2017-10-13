@@ -2,7 +2,7 @@ var assert = require('assert');
 var request = require('supertest');
 
 module.exports.test = function(){
-  var agent = request.agent(app);
+  var agent = request.agent(app.listen());
 
   describe('session creation =>', function() {
     describe('POST /mobile/createSession =>', function() {
@@ -117,6 +117,27 @@ module.exports.test = function(){
     });
   });
 
+  describe('getUsers =>', function(){
+    describe('POST /mobile/getUsers =>', function (){
+      it('Getting Users', function(done){
+        agent
+          .post('/mobile/getUsers')
+          .send({
+            session_id: 'xxxxx'
+          })
+          .type('form')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', 'text/html; charset=utf-8')
+          .expect(404)
+          .expect(200)
+          .end(function(err, res){
+            if(err) return done(err);
+            done();
+          });
+          done();
+      });
+    });
+  });
 };
 
 /*
