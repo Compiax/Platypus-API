@@ -1,7 +1,7 @@
 Platypus-API
 =====================
 
-This cross-platform mobile application will effortlessly assist with the task of deciding who will pay what when the bill arrives. After taking a photo of your bill OCR text recognition will create an interface that will be used to claim items and see the total amount you owe. The same interface will be duplicated on everyone around the table's phone and changes will be updated on the different phones in real time.
+Split Bill is a cross-platform mobile application that serves to ease the process of splitting a restaurant bill when eating out with friends. Using OCR technology and the mobile camera, the app allows multiple users to join the session and on their own phones to claim, edit, add and delete items on the bill. The app shows the total of the user's claims and calculates a tip, completely removing the need for financial mathematics after a friendly meal.
 
 This is the repository for the API of the system. It is responsible for front-end functionality, data flow, storage and communication.
 
