@@ -17,6 +17,9 @@
     "http": {
       "port": "3000"
     },
+    "io": {
+      "port": "3002"
+    },
     "db": {
       "host": "127.0.0.1",
       "database": "platypus"
