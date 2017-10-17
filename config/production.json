@@ -28,7 +28,7 @@
     },
     "ocr": {
       "host": "platypus-ocr-prod",
-      "port": "3001"
+      "port": "5000"
     }
   }
 }
