@@ -2,8 +2,9 @@
  * @file This file implements the defined routes for use by the mobile
  * componant.
  */
+var config = require('config');
 var debug = require('debug')('platypus-api:controllers:mobile');
-var io = require('socket.io').listen(3002);
+var io = require('socket.io').listen(config.servers.io.port);
 var billHelper = require('../helpers/database').bill;
 
 debug('Exporting method: connectSessionSocket');

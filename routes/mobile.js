@@ -31,11 +31,7 @@ router.post('/getAllSessionData', mobile.getAllSessionData);
 
 router.post('/leaveSession', mobile.leaveSession);
 
-<<<<<<< HEAD
 //router.post('/isDorment'), mobile.isDorment);
-=======
-router.post('/isDorment', mobile.isDorment);
->>>>>>> 7a491247f4c2ce549c9bfcfd8de9fe5a9be88ae2
 
 /**
  * Define route for the getItems function.
