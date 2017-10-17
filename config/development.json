@@ -17,13 +17,16 @@
     "http": {
       "port": "3000"
     },
+    "io": {
+      "port": "3002"
+    },
     "db": {
       "host": "platypus-db-dev",
       "database": "platypus"
     },
     "ocr": {
       "host": "platypus-ocr-dev",
-      "port": "3001"
+      "port": "5000"
     }
   }
 }
