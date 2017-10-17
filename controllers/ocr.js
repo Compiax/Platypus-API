@@ -44,7 +44,8 @@ module.exports.detect = function(target_path, bill) {
     var formData = {
       file: fs.createReadStream(target_path),
     };
-    request.post({url:'http://192.168.43.144' + /*+ ocr_module +*/ ':' + ocr_port + '/', formData: formData, json: true}, function optionalCallback(err, httpResponse, body) {
+    //request.post({url:'http://192.168.43.144' + /*+ ocr_module +*/ ':' + ocr_port + '/', formData: formData, json: true}, function optionalCallback(err, httpResponse, body) {
+    request.post({url:ocr_module + /*+ ocr_module +*/ ':' + ocr_port + '/', formData: formData, json: true}, function optionalCallback(err, httpResponse, body) {
       if (err) {
         debug("OCR Failed");
         debug(httpResponse);
