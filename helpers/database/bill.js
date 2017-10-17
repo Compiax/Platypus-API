@@ -129,7 +129,7 @@ module.exports.removeUserFromDB = function(user_id, session_id) {
 	});
 }
 
-module.export.isSessionEmpty = function (session_id) {
+module.exports.isSessionEmpty = function (session_id) {
 	return new promise(function (resolve) {
 		Bills.findOne({
 			bill_id: session_id
