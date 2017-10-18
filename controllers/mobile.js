@@ -1,6 +1,6 @@
 /**
  * @file This file implements the defined routes for use by the mobile
- * componant. As well as helper functions for these routes.
+ * component. As well as helper functions for these routes.
  */
 var debug = require('debug')('platypus-api:controllers:mobile');
 var fs = require('fs');
@@ -109,7 +109,7 @@ module.exports.sendImage = function (req, res, next) {
 
 debug("Exporting method getAllSessionData");
 /**
- * Function to featch data from database.
+ * Function to fetch data from database.
  * @param {request} req req used by Express.js to fetch data from the client.
  *                      Used to fetch session_id from req.body.session_id and
  *                      the file name from req.body.originalname.
@@ -128,6 +128,17 @@ module.exports.getAllSessionData = function(req, res, next) {
   });
 }
 
+debug("Exporting method getItems");
+/**
+ * Function to fetch items from database.
+ * @param {request} req req used by Express.js to fetch data from the client.
+ *                      Used to fetch session_id from req.body.session_id.
+ * @param {response} res res used by Express.js to send responses back to the
+ *                       client.
+ * @param {object} next
+ * @return HTTP status 200 using res.send(). Returns a JSON object containing
+ * Session Items
+ */
 module.exports.getItems = function(req, res, next) {
   var b_id = req.body.session_id;
   billHelper.fetchBillItems(b_id).then(function (items_response) {
@@ -137,6 +148,17 @@ module.exports.getItems = function(req, res, next) {
   });
 }
 
+debug("Exporting method getUsers");
+/**
+ * Function to fetch users from database.
+ * @param {request} req req used by Express.js to fetch data from the client.
+ *                      Used to fetch session_id from req.body.session_id.
+ * @param {response} res res used by Express.js to send responses back to the
+ *                       client.
+ * @param {object} next
+ * @return HTTP status 200 using res.send(). Returns a JSON object containing
+ * Session Users
+ */
 module.exports.getUsers = function(req, res, next) {
   var b_id = req.body.session_id;
   billHelper.fetchBillUsers(b_id).then(function (users_response) {
@@ -146,6 +168,17 @@ module.exports.getUsers = function(req, res, next) {
   });
 }
 
+debug("Exporting method getOwner");
+/**
+ * Function to fetch owner from database.
+ * @param {request} req req used by Express.js to fetch data from the client.
+ *                      Used to fetch session_id from req.body.session_id.
+ * @param {response} res res used by Express.js to send responses back to the
+ *                       client.
+ * @param {object} next
+ * @return HTTP status 200 using res.send(). Returns a JSON object containing
+ * Session owner
+ */
 module.exports.getOwner = function(req, res, next) {
   var b_id = req.body.session_id;
   billHelper.fetchBillOwner(b_id).then(function (owner_response) {
@@ -155,6 +188,18 @@ module.exports.getOwner = function(req, res, next) {
   });
 }
 
+debug("Exporting method validateSessionData");
+/**
+ * Function to determine if a given user belongs to a given session.
+ * @param {request} req req used by Express.js to fetch data from the client.
+ *                      Used to fetch session_id from req.body.session_id and
+ *                      user_id from req.body.user_id
+ * @param {response} res res used by Express.js to send responses back to the
+ *                       client.
+ * @param {object} next
+ * @return HTTP status 200 using res.send(). Returns a JSON object containing
+ * true or false
+ */
 module.exports.validateSessionData = function(req, res, next) {
   var session = req.body.session_id;
   var user = req.body.user_id;
@@ -162,6 +207,7 @@ module.exports.validateSessionData = function(req, res, next) {
     return valid_response;
   });
 }
+
 
 module.exports.leaveSession = function (req, res, next) {
   debug("Leave Session called");
@@ -190,7 +236,7 @@ module.exports.isDorment = function (req, res, next) {
 }
 
 module.exports.fetchUserClaims = function(req, res, next) {
-  var user_id = req.body.u_id;
+  var user_id = req.body.user_id;
   billHelper.fetchUserClaims(user_id).then(function(claims_response) {
     return res.status(200).send(claims_response);
   });
