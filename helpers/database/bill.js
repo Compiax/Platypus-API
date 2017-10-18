@@ -212,8 +212,8 @@ module.exports.addItemToDB = function(session_id, price, name, quantity) {
 				var subdoc = doc.bill_items[doc.items_count];
 				subdoc.isNew;
 				doc.items_count += 1;
-				doc.bill_total += price;
-				doc.bill_unclaimed_total += price;
+				doc.bill_total += parseFloat(price);
+				doc.bill_unclaimed_total += parseFloat(price);
 				doc.save(function (err) {
 					if (err) return handleError(err);
 					item.save(function (err) {
@@ -222,15 +222,9 @@ module.exports.addItemToDB = function(session_id, price, name, quantity) {
 				});
 				debug("Added item: " + doc.items_count);
 				var response = {
-					data: {
-						type: 'new_item',
-						id: 0,
-						attributes: {
-							i_item	:	item,
+							i_response	:	item,
 							new_total	 : doc.bill_total,
-							new_unclaimed_total : doc.bill_unclaimed_total
-						}
-					}
+							bill_unclaimed_total : doc.bill_unclaimed_total
 				};
 				resolve(response);
 			}
@@ -271,34 +265,41 @@ module.exports.claimItem = function (data) {
 				});
 				user.save();
 			}
-		});
-
-		Items.findOne({
-			i_id: data.item_id
-		}, function (err, item) {
-			if (item) {
-				item.i_quantity = item.i_quantity - (data.quantity - userAmountPrev);
-				item.save(function (err) {
-					if (err) return handleError(err);
-				});
-			}
-			Bills.findOne({
-				bill_id: data.session_id
-			}, function (err, bill) {
-				if (bill) {
-					priceOfClaim = item.i_price * (data.quantity - userAmountPrev);
-					bill.bill_unclaimed_total = bill.bill_unclaimed_total - priceOfClaim;
-					bill.save(function (err) {
+			Items.findOne({
+				i_id: data.item_id
+			}, function (err, item) {
+				var qClaimed = 0;
+				if (item) {
+					if ((data.quantity - userAmountPrev) > item.i_quantity) {
+						qClaimed = item.i_quantity;
+						item.i_quantity = 0;
+					}
+					else {
+						qClaimed = data.quantity - userAmountPrev;
+						item.i_quantity = item.i_quantity - (data.quantity - userAmountPrev);
+					}
+					item.save(function (err) {
 						if (err) return handleError(err);
 					});
 				}
-				var response = {
-					u_id : data.user_id,
-					i_response : item,
-					u_quantity : data.quantity,
-					new_unclaimed_total : bill.bill_unclaimed_total
-				};
-				resolve(response);
+				Bills.findOne({
+					bill_id: data.session_id
+				}, function (err, bill) {
+					if (bill) {
+						priceOfClaim = item.i_price * qClaimed;
+						bill.bill_unclaimed_total = bill.bill_unclaimed_total - priceOfClaim;
+						bill.save(function (err) {
+							if (err) return handleError(err);
+						});
+					}
+					var response = {
+						u_id : data.user_id,
+						i_response : item,
+						u_quantity : data.quantity,
+						bill_unclaimed_total : bill.bill_unclaimed_total
+					};
+					resolve(response);
+				});
 			});
 		});
 	});
@@ -327,7 +328,7 @@ module.exports.unclaimItem = function (data) {
 				}
 				var response = {
 					i_response : item,
-					new_unclaimed_total : bill.bill_unclaimed_total
+					bill_unclaimed_total : bill.bill_unclaimed_total
 				};
 				resolve(response);
 			});
@@ -341,35 +342,40 @@ module.exports.editItem = function(data) {
 			i_id: data.item_id
 		}, function(err, item){
 			var oldPrice = item.i_price;
+			var oldQuantity = item.i_quantity;
+			var claimsQuantity = 0;
 			item.i_name = data.name;
 			item.i_quantity = data.quantity;
 			item.i_price = data.price;
-			debug(oldPrice + " " + item.i_name + " " + item.i_quantity + " " + item.i_price);
+			debug(item.i_name + " " + item.i_quantity + " " + item.i_price);
 			item.save(function (err) {
 				if (err) return handleError(err);
 				});
 			Bills.findOne({
 				bill_id: data.session_id
 			}, function (err, doc) {
-				debug("Bill Total: ");
-				debug(doc.bill_total);
-				doc.bill_total -= oldPrice;
-				doc.bill_unclaimed_total -= oldPrice;
-				doc.bill_total += parseFloat(data.price);
-				doc.bill_unclaimed_total -= data.price;
-				doc.save(function (err) {
-					if (err) return handleError(err);
-					item.save(function (err) {
+				Claims.findOne({item_id: data.item_id}, function(err, claim){
+					if(claim) {
+						claimsQuantity = claim.quantity;
+					}
+					doc.bill_total -= oldPrice * (oldQuantity + claimsQuantity);
+					doc.bill_total += data.price * (data.quantity + claimsQuantity);
+					doc.bill_unclaimed_total -= oldPrice * oldQuantity;
+					doc.bill_unclaimed_total += data.price * data.quantity;
+					doc.save(function (err) {
 						if (err) return handleError(err);
+						item.save(function (err) {
+							if (err) return handleError(err);
+						});
 					});
+					var response = {
+						i_response : item,
+						new_total	 : doc.bill_total,
+						bill_unclaimed_total : doc.bill_unclaimed_total
+					};
+					debug(response);
+					resolve(response);
 				});
-				var response = {
-					i_response : item,
-					new_total	 : doc.bill_total,
-					new_unclaimed_total : doc.bill_unclaimed_total
-				};
-				debug(response);
-				resolve(response);
 			});
 		});
 	});
@@ -379,40 +385,41 @@ module.exports.deleteItem = function(data) {
 	return new Promise(function (resolve, reject) {
 		debug("deleteItem: SessionID: " + data.session_id + " ItemID: " + data.item_id);
 		var itemIdToRemove = null;
-		var claimIdToRemove = null;
 		var priceToDeduct = 0;
 		var i_idToRemove = "";
 		var nTotal = 0;
 		var nUnclaimed = 0;
-		Items.findOne({i_id: data.item_id}, function(err, item){
+		Items.findOne({
+			i_id: data.item_id
+		}, function(err, item){
 			debug("Found item");
 			debug(item.i_id);
 			itemIdToRemove = item._id;
 			i_idToRemove = item.i_id;
 			priceToDeduct = item.i_price;
-		});
-		Claims.find({item_id: data.item_id}).remove().exec();
-		Bills.findOne({bill_id: data.session_id}, function(err, bill){
-			bill.items_count -= 1;
-			bill.bill_total -= priceToDeduct;
-			nTotal = bill.bill_total;
-			bill.bill_unclaimed_total -= priceToDeduct;
-			nUnclaimed = bill.bill_unclaimed_total;
-			bill.bill_items.pull({_id: itemIdToRemove});
-			bill.save(function (err) {
-				if (err) return handleError(err);
+			Claims.find({item_id: data.item_id}).remove().exec();
+			Bills.findOne({bill_id: data.session_id}, function(err, bill){
+				bill.items_count -= 1;
+				bill.bill_total -= priceToDeduct;
+				nTotal = bill.bill_total;
+				bill.bill_unclaimed_total -= priceToDeduct;
+				nUnclaimed = bill.bill_unclaimed_total;
+				bill.bill_items.pull({_id: itemIdToRemove});
+				bill.save(function (err) {
+					if (err) return handleError(err);
+				});
+				Bills.update({
+					bill_id: data.session_id
+				}, {"$pull": {bill_items: {_id: itemIdToRemove}}}, function (err, doc) {
+					debug("Added item: " + doc.i_id);
+					var response = {
+								i_id	:	i_idToRemove,
+								new_total	 : nTotal,
+								bill_unclaimed_total : nUnclaimed
+							}
+					resolve(response);
+				});
 			});
-		});
-		Bills.update({
-			bill_id: data.session_id
-		}, {"$pull": {bill_items: {_id: claimIdToRemove}}}, function (err, doc) {
-			debug("Added item: " + doc.items_count);
-			var response = {
-						i_id	:	i_idToRemove,
-						new_total	 : nTotal,
-						new_unclaimed_total : nUnclaimed
-					}
-			resolve(response);
 		});
 	});
 }
@@ -517,7 +524,7 @@ module.exports.fetchBillItems = function(session_id) {
 					attributes: {
 						items: doc.bill_items,
 						bill_total: doc.bill_total,
-						unclaimed_total : doc.bill_unclaimed_total
+						bill_unclaimed_total : doc.bill_unclaimed_total
 					}
 				}
 			};
