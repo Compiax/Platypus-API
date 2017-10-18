@@ -164,7 +164,7 @@ module.exports.populateItems = function(items, session_id, image) {
 					i_price: parseFloat(iter.price)
 				});
 				doc.bill_items.push(item);
-				var subdoc = doc.bill_items[doc.items_count];
+				var subdoc = doc.bill_items[doc.bill_items.length-1];
 				subdoc.isNew;
 				doc.items_count += 1;
 				totalCalc += (item.i_price * parseFloat(item.i_quantity));
@@ -213,8 +213,8 @@ module.exports.addItemToDB = function(session_id, price, name, quantity) {
 					i_price: parseFloat(price)
 				});
 				doc.bill_items.push(item);
-				debug(doc.bill_items[doc.items_count]);
-				var subdoc = doc.bill_items[doc.items_count];
+				debug(doc.bill_items[doc.bill_items.length-1]);
+				var subdoc = doc.bill_items[doc.bill_items.length-1];
 				subdoc.isNew;
 				doc.items_count += 1;
 				doc.bill_total += parseFloat(item.i_price * item.i_quantity);
